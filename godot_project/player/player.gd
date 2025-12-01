@@ -1,22 +1,18 @@
 extends CharacterBody3D
 
-var sensitivity = 0.5
-var paused
+var sensitivity = Global.sensitivity
+var paused = Global.paused
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	$first_person_cam.make_current()
 	paused = false
 
 # mouse movement code
 func _unhandled_input(event):
-	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		rotation_degrees.y -= event.relative.x * sensitivity
-		$Camera3D.rotation_degrees.x -= event.relative.y * sensitivity
-		# limits for vertical rotation
-		$Camera3D.rotation_degrees.x = clamp($Camera3D.rotation_degrees.x, -80, 80)
 	# release mouse on cancel event
-	elif event.is_action_pressed("ui_cancel"):
+	if event.is_action_pressed("ui_cancel"):
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			# call to pause menu code here
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -24,11 +20,18 @@ func _unhandled_input(event):
 		else:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 			paused = false
+	elif event is InputEventMouseMotion and not paused:
+		rotation_degrees.y -= event.relative.x * sensitivity
+		$first_person_cam.rotation_degrees.x -= event.relative.y * sensitivity
+		# limits for vertical rotation
+		$first_person_cam.rotation_degrees.x = clamp($first_person_cam.rotation_degrees.x, -80, 80)
+	elif event.is_action_pressed("switch_camera") and not paused:
+		$third_person_spring/third_person_cam.make_current()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 # Don't use for tick events, will break game if framerate is not expected
-func _process(delta: float) -> void:
-	pass
+#func _process(delta: float) -> void:
+#	pass
 
 # movement code
 func _physics_process(delta):
@@ -46,6 +49,7 @@ func _physics_process(delta):
 	if not paused:
 		velocity.x = direction.x * WALK_SPEED
 		velocity.z = direction.z * WALK_SPEED
+		
 		if not is_on_floor():
 			velocity.y -= GRAVITY * delta
 		elif Input.is_action_just_pressed("jump"):
