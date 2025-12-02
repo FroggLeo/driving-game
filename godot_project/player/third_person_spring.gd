@@ -26,3 +26,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotation_degrees.x -= event.relative.y * Global.sensitivity
 		# limits for vertical rotation
 		rotation_degrees.x = clamp(rotation_degrees.x, -80, 40)
+	
+	if event.is_action_pressed("zoom_in"):
+		%third_person_spring.spring_length -= 1
+		clamp(%third_person_spring.spring_length, 0, 8)
+	elif event.is_action_pressed("zoom_out"):
+		%third_person_spring.spring_length += 1
+		clamp(%third_person_spring.spring_length, 0, 8)

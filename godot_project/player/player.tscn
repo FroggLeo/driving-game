@@ -25,6 +25,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_sh265")
 
 [node name="third_person_spring" type="SpringArm3D" parent="."]
+unique_name_in_owner = true
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 1.5, 0)
 shape = SubResource("SphereShape3D_oul6g")
 spring_length = 6.0
