@@ -56,22 +56,24 @@ func _physics_process(delta):
 	const GRAVITY = 9.81
 	const JUMP_VELOCITY = 2.7
 	
+	if Global.paused:
+		return
+	
 	# movement code or something
+	# TODO 
 	var input_direction_2D = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var input_direction_3D = Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
 	var direction = transform.basis * input_direction_3D
 	direction.y = 0
 	direction = direction.normalized()
 	
-	if Global.paused:
-		return
-	
 	velocity.x = direction.x * WALK_SPEED
 	velocity.z = direction.z * WALK_SPEED
 	
+	# jumping code
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
-	elif Input.is_action_just_pressed("jump"):
+	elif Input.is_action_just_pressed("jump") and velocity.y == 0:
 		velocity.y = JUMP_VELOCITY
 	else:
 		velocity.y = 0

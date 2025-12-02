@@ -13,7 +13,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	var mouse_pos: Vector2
-	# 3rd person camera rotation code
+	
+	# mouse control code
+	# TODO: integrate with first person camera so it switches automagically
 	if event.is_action_pressed("move_camera"):
 		mouse_pos = get_viewport().get_mouse_position()
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -21,12 +23,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		Input.warp_mouse(mouse_pos)
 	
+	# 3rd person camera rotation code
 	if event is InputEventMouseMotion and Input.is_action_pressed("move_camera"):
 		rotation_degrees.y -= event.relative.x * Global.sensitivity
 		rotation_degrees.x -= event.relative.y * Global.sensitivity
 		# limits for vertical rotation
 		rotation_degrees.x = clamp(rotation_degrees.x, -80, 40)
 	
+	# zoom in and out
+	# TODO fix clamp, limit min and max zoom
+	# TODO smooth zoom movement
 	if event.is_action_pressed("zoom_in"):
 		%third_person_spring.spring_length -= 1
 		clamp(%third_person_spring.spring_length, 0, 8)
