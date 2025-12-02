@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=10 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
+[ext_resource type="Texture2D" uid="uid://4y8kw5fqwwxu" path="res://addons/kenney_prototype_textures/dark/texture_09.png" id="1_fj7yv"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_f3sb7"]
 
@@ -15,6 +16,11 @@ sky = SubResource("Sky_f3sb7")
 
 [sub_resource type="BoxMesh" id="BoxMesh_f3sb7"]
 size = Vector3(10, 1, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f3sb7"]
+albedo_texture = ExtResource("1_fj7yv")
+uv1_triplanar = true
+uv2_triplanar = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fj7yv"]
 size = Vector3(10, 1, 10)
@@ -32,6 +38,7 @@ physics_material_override = SubResource("PhysicsMaterial_gv5m4")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 mesh = SubResource("BoxMesh_f3sb7")
 skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_f3sb7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="floor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)

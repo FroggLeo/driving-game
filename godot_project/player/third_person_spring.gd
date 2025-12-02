@@ -1,21 +1,28 @@
 extends SpringArm3D
 
-var sensitivity = Global.sensitivity
-var paused = Global.paused
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta: float) -> void:
 #	pass
 
 func _unhandled_input(event: InputEvent) -> void:
-	if paused:
-		pass
-	elif event is InputEventMouseMotion:
-		rotation_degrees.y -= event.relative.x * sensitivity
-		$third_person_cam.rotation_degrees.x -= event.relative.y * sensitivity
+	if Global.paused:
+		return
+	
+	var mouse_pos: Vector2
+	# 3rd person camera rotation code
+	if event.is_action_pressed("move_camera"):
+		mouse_pos = get_viewport().get_mouse_position()
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	elif event.is_action_released("move_camera"):
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		Input.warp_mouse(mouse_pos)
+	
+	if event is InputEventMouseMotion and Input.is_action_pressed("move_camera"):
+		rotation_degrees.y -= event.relative.x * Global.sensitivity
+		rotation_degrees.x -= event.relative.y * Global.sensitivity
 		# limits for vertical rotation
-		$third_person_cam.rotation_degrees.x = clamp($third_person_cam.rotation_degrees.x, -80, 80)
+		rotation_degrees.x = clamp(rotation_degrees.x, -80, 40)
