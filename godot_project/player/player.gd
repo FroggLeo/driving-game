@@ -60,15 +60,35 @@ func _physics_process(delta):
 		return
 	
 	# movement code or something
-	# TODO 
+	# I have no idea how this works
+	# TODO make it work with 3rd person
 	var input_direction_2D = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var input_direction_3D = Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
-	var direction = transform.basis * input_direction_3D
-	direction.y = 0
-	direction = direction.normalized()
+	var direction
 	
+	if first_person:
+		var input_direction_3D = Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
+		direction = transform.basis * input_direction_3D
+		direction.y = 0
+	else:
+		# gets the spring arm rotation
+		var cam_rotation = $third_person_spring.global_transform.basis
+		
+		# only need to do forward and right
+		var forward = -cam_rotation.z
+		forward.y = 0
+		var right = cam_rotation.x
+		right.y = 0
+		
+		direction = (right * input_direction_2D.x) + (forward * input_direction_2D.y)
+	
+	# this line like prevents the player from moving faster when they are going diagonally
+	direction = direction.normalized()
+	# apply the calculated speeds based on direction
 	velocity.x = direction.x * WALK_SPEED
 	velocity.z = direction.z * WALK_SPEED
+	
+	
+	
 	
 	# jumping code
 	if not is_on_floor():

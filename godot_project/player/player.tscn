@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://bjkm6ximd4nus"]
+[gd_scene load_steps=7 format=3 uid="uid://bjkm6ximd4nus"]
 
 [ext_resource type="Script" uid="uid://dtij50yl4tfg1" path="res://player/player.gd" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://b5if6cd5wxbpt" path="res://player/third_person_spring.gd" id="2_rkbax"]
@@ -8,6 +8,8 @@
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_sh265"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_oul6g"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_rkbax"]
 
 [node name="CharacterBody3D" type="CharacterBody3D"]
 script = ExtResource("1_4flbx")
@@ -28,7 +30,10 @@ mesh = SubResource("CapsuleMesh_sh265")
 unique_name_in_owner = true
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 1.5, 0)
 shape = SubResource("SphereShape3D_oul6g")
-spring_length = 6.0
 script = ExtResource("2_rkbax")
 
 [node name="third_person_cam" type="Camera3D" parent="third_person_spring"]
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0, 0, 0, 0.6, 0, 1.5, -0.29999998)
+mesh = SubResource("BoxMesh_rkbax")
