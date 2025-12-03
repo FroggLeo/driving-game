@@ -34,8 +34,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	# TODO fix clamp, limit min and max zoom
 	# TODO smooth zoom movement
 	if event.is_action_pressed("zoom_in"):
-		%third_person_spring.spring_length -= 1
+		%third_person_spring.spring_length += 1
 		clamp(%third_person_spring.spring_length, 0, 8)
 	elif event.is_action_pressed("zoom_out"):
-		%third_person_spring.spring_length += 1
+		%third_person_spring.spring_length -= 1
 		clamp(%third_person_spring.spring_length, 0, 8)
