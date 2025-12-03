@@ -2,6 +2,7 @@ extends Node
 
 @export var sensitivity: float = 0.2
 @export var paused: bool = false
+@export var zoom_inc: float = 1
 
 # Called when the node enters the scene tree for the first time.
 #func _ready() -> void:

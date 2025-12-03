@@ -1,47 +1,48 @@
 extends CharacterBody3D
 
-var sensitivity = Global.sensitivity
-var first_person = true
+var first_person: bool
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	%third_person_spring.spring_length = 0
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	$first_person_cam.make_current()
 	Global.paused = false
 
-# mouse movement code
 func _unhandled_input(event):
 	# release mouse on cancel event
 	if event.is_action_pressed("ui_cancel"):
 		if Global.paused:
-			# call to pause menu code here
-			if first_person:
+			if Global.first_person:
 				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 			else:
 				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 			Global.paused = false
 		else:
+			# call to pause menu code here
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 			Global.paused = true
 	
 	if Global.paused:
 		return
 	
+	first_person = %third_person_spring.spring_length == 0
+	
 	# first person camera movement
 	if event is InputEventMouseMotion and first_person:
-		rotation_degrees.y -= event.relative.x * sensitivity
-		$first_person_cam.rotation_degrees.x -= event.relative.y * sensitivity
+		rotation_degrees.y -= event.relative.x * Global.sensitivity
+		$first_person_cam.rotation_degrees.x -= event.relative.y * Global.sensitivity
 		# limits for vertical rotation
 		$first_person_cam.rotation_degrees.x = clamp($first_person_cam.rotation_degrees.x, -80, 80)
 	
 	# switch camera
-	if event.is_action_pressed("switch_camera"):
-		if first_person:
-			first_person = false
+	if first_person:
+		if event.is_action_pressed("zoom_out"):
+			$third_person_spring.spring_length = Global.zoom_inc
 			$third_person_spring/third_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		else:
-			first_person = true
+		elif event.is_action_pressed("zoom_in"):
+			$third_person_spring.spring_length = 0
 			$first_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
@@ -60,8 +61,6 @@ func _physics_process(delta):
 		return
 	
 	# movement code or something
-	# I have no idea how this works
-	# TODO make it work with 3rd person
 	var input_direction_2D = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction
 	
@@ -86,9 +85,6 @@ func _physics_process(delta):
 	# apply the calculated speeds based on direction
 	velocity.x = direction.x * WALK_SPEED
 	velocity.z = direction.z * WALK_SPEED
-	
-	
-	
 	
 	# jumping code
 	if not is_on_floor():
