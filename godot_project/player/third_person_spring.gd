@@ -15,20 +15,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	first_person = %third_person_spring.spring_length == 0
-	
 	if first_person:
 		return
 	
-	var mouse_pos: Vector2
-	
+	# HACK lock mouse when rotating at current position
+	#var mouse_pos: Vector2
+	#mouse_pos = get_viewport().get_mouse_position()
+	#Input.warp_mouse(mouse_pos)
 	# mouse control code
-	# TODO: integrate with first person camera so it switches automagically
 	if event.is_action_pressed("move_camera"):
-		mouse_pos = get_viewport().get_mouse_position()
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	elif event.is_action_released("move_camera"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		Input.warp_mouse(mouse_pos)
 	
 	# 3rd person camera rotation code
 	if event is InputEventMouseMotion and Input.is_action_pressed("move_camera"):

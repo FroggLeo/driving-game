@@ -10,10 +10,13 @@ func _ready():
 	Global.paused = false
 
 func _unhandled_input(event):
+	
+	first_person = %third_person_spring.spring_length == 0
+	
 	# release mouse on cancel event
 	if event.is_action_pressed("ui_cancel"):
 		if Global.paused:
-			if Global.first_person:
+			if first_person:
 				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 			else:
 				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -26,8 +29,6 @@ func _unhandled_input(event):
 	if Global.paused:
 		return
 	
-	first_person = %third_person_spring.spring_length == 0
-	
 	# first person camera movement
 	if event is InputEventMouseMotion and first_person:
 		rotation_degrees.y -= event.relative.x * Global.sensitivity
@@ -35,14 +36,15 @@ func _unhandled_input(event):
 		# limits for vertical rotation
 		$first_person_cam.rotation_degrees.x = clamp($first_person_cam.rotation_degrees.x, -80, 80)
 	
-	# switch camera
+	# auto switch camera
+	# TODO match camera rotation when switching cams
 	if first_person:
 		if event.is_action_pressed("zoom_out"):
-			$third_person_spring.spring_length = Global.zoom_inc
+			%third_person_spring.spring_length = Global.zoom_inc
+			#%third_person_spring.set = Vector3(45, 45, 45)
 			$third_person_spring/third_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		elif event.is_action_pressed("zoom_in"):
-			$third_person_spring.spring_length = 0
 			$first_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
@@ -61,6 +63,7 @@ func _physics_process(delta):
 		return
 	
 	# movement code or something
+	# TODO rotate player in the moving direction
 	var input_direction_2D = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction
 	
@@ -70,10 +73,10 @@ func _physics_process(delta):
 		direction.y = 0
 	else:
 		# gets the spring arm rotation
-		var cam_rotation = $third_person_spring.global_transform.basis
+		var cam_rotation = %third_person_spring.global_transform.basis
 		
 		# only need to do forward and right
-		var forward = -cam_rotation.z
+		var forward = cam_rotation.z
 		forward.y = 0
 		var right = cam_rotation.x
 		right.y = 0
