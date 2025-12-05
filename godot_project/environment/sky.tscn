@@ -1,0 +1,40 @@
+[gd_scene load_steps=7 format=3 uid="uid://cmvvu0pixwdta"]
+
+[ext_resource type="Shader" uid="uid://c74ktvjqn23l7" path="res://environment/sky.gdshader" id="1_gr5xt"]
+[ext_resource type="Script" uid="uid://bhq4nv4os3os0" path="res://environment/sky.gd" id="2_dptxg"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gr5xt"]
+shader = ExtResource("1_gr5xt")
+shader_parameter/skyColor = Color(0.40432602, 0.4500072, 0.72233397, 1)
+
+[sub_resource type="Sky" id="Sky_dptxg"]
+sky_material = SubResource("ShaderMaterial_gr5xt")
+
+[sub_resource type="Environment" id="Environment_py8sg"]
+background_mode = 2
+sky = SubResource("Sky_dptxg")
+ambient_light_source = 3
+
+[sub_resource type="SphereMesh" id="SphereMesh_gr5xt"]
+
+[node name="sky" type="WorldEnvironment"]
+environment = SubResource("Environment_py8sg")
+script = ExtResource("2_dptxg")
+
+[node name="sun" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="sun"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+mesh = SubResource("SphereMesh_gr5xt")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="sun/MeshInstance3D"]
+
+[node name="moon" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="moon"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+mesh = SubResource("SphereMesh_gr5xt")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="moon/MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, -1, -8.742278e-08, 0, 8.742278e-08, -1, 0, 0, 0)
+light_energy = 0.12

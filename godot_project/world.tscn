@@ -1,31 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=8 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
 [ext_resource type="Texture2D" uid="uid://4y8kw5fqwwxu" path="res://addons/kenney_prototype_textures/dark/texture_09.png" id="1_fj7yv"]
-
-[sub_resource type="Shader" id="Shader_fj7yv"]
-code = "shader_type sky;
-
-uniform vec3 skyColor : source_color;
-
-void sky() {
-	COLOR = skyColor;
-}
-"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_aqk2v"]
-shader = SubResource("Shader_fj7yv")
-shader_parameter/skyColor = Color(0.8091264, 0.718837, 0.9020615, 1)
-
-[sub_resource type="Sky" id="Sky_036b0"]
-sky_material = SubResource("ShaderMaterial_aqk2v")
-
-[sub_resource type="Environment" id="Environment_dwbse"]
-background_mode = 2
-sky = SubResource("Sky_036b0")
-ambient_light_source = 3
-tonemap_mode = 2
-glow_enabled = true
+[ext_resource type="PackedScene" uid="uid://cmvvu0pixwdta" path="res://environment/sky.tscn" id="3_tlwt5"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_gv5m4"]
 
@@ -41,13 +18,6 @@ uv2_triplanar = true
 size = Vector3(10, 1, 10)
 
 [node name="World" type="Node3D"]
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_dwbse")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-shadow_enabled = true
 
 [node name="floor" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -65,3 +35,5 @@ shape = SubResource("BoxShape3D_fj7yv")
 
 [node name="CharacterBody3D" parent="." instance=ExtResource("1_f3sb7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Node3D" parent="." instance=ExtResource("3_tlwt5")]
