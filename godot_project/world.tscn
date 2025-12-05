@@ -1,16 +1,31 @@
-[gd_scene load_steps=10 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=11 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
 [ext_resource type="Texture2D" uid="uid://4y8kw5fqwwxu" path="res://addons/kenney_prototype_textures/dark/texture_09.png" id="1_fj7yv"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_f3sb7"]
+[sub_resource type="Shader" id="Shader_fj7yv"]
+code = "shader_type sky;
 
-[sub_resource type="Sky" id="Sky_f3sb7"]
-sky_material = SubResource("ProceduralSkyMaterial_f3sb7")
+uniform vec3 skyColor : source_color;
 
-[sub_resource type="Environment" id="Environment_fj7yv"]
+void sky() {
+	COLOR = skyColor;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_aqk2v"]
+shader = SubResource("Shader_fj7yv")
+shader_parameter/skyColor = Color(0.8091264, 0.718837, 0.9020615, 1)
+
+[sub_resource type="Sky" id="Sky_036b0"]
+sky_material = SubResource("ShaderMaterial_aqk2v")
+
+[sub_resource type="Environment" id="Environment_dwbse"]
 background_mode = 2
-sky = SubResource("Sky_f3sb7")
+sky = SubResource("Sky_036b0")
+ambient_light_source = 3
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_gv5m4"]
 
@@ -28,7 +43,11 @@ size = Vector3(10, 1, 10)
 [node name="World" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_fj7yv")
+environment = SubResource("Environment_dwbse")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
 
 [node name="floor" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
