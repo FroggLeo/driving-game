@@ -24,7 +24,7 @@ script = ExtResource("2_dptxg")
 [node name="sun" type="Node3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="sun"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
 mesh = SubResource("SphereMesh_gr5xt")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="sun/MeshInstance3D"]
@@ -32,7 +32,7 @@ mesh = SubResource("SphereMesh_gr5xt")
 [node name="moon" type="Node3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="moon"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 5, 0)
 mesh = SubResource("SphereMesh_gr5xt")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="moon/MeshInstance3D"]
