@@ -2,9 +2,9 @@ extends WorldEnvironment
 
 # seconds in a day
 @export var day_length: float = 10
-# days to take the moon to do one cycle
-@export var moon_length: float = 29.5
 
+# days to take the moon to do one cycle, from full moon to full moon
+@export var moon_length: float = 29.5
 # days in a year
 @export var year_length: float = 10
 # moon cycle time between +-moon_axial_tilt degrees, in years
@@ -15,9 +15,9 @@ extends WorldEnvironment
 @export var axial_tilt: float = 23.5
 # tilt of the moon relative to the sun
 @export var moon_axial_tilt: float = 5.0
-# tilt of the equinox from the vertical, or the degree of the latitiude
+# tilt of the equinox from the vertical, or the degree of the latitude
 # 34 degrees is around los angeles's equinox
-@export var latitiude = 34
+@export var latitude = 34
 
 # nodes used
 @onready var sun = $sun_tilt/sun
@@ -39,8 +39,8 @@ extends WorldEnvironment
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# set the tilt of the equinox
-	sun.rotation.x = deg_to_rad(latitiude)
-	moon.rotation.x = deg_to_rad(latitiude)
+	sun.rotation.x = deg_to_rad(latitude)
+	moon.rotation.x = deg_to_rad(latitude)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -50,7 +50,7 @@ func _process(delta: float) -> void:
 	# calculate global time change
 	var time_change = delta / day_length
 	
-	# calculate day time
+	# calculate day/sun time
 	time += time_change
 	if time >= 1.0:
 		time = 0
