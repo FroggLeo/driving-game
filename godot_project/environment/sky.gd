@@ -1,7 +1,7 @@
 extends WorldEnvironment
 
 # seconds in a day
-@export var day_length: float = 10
+@export var day_length: float = 0.05
 # days to take the moon to do one cycle
 @export var moon_cycle: float = 29.5
 # days in a year
@@ -41,7 +41,7 @@ func _process(delta: float) -> void:
 	# using sin so that it goes from -1 to 1 instead of 0 to 1
 	# trig...
 	var sun_tilt_angle = deg_to_rad(axial_tilt) * sin(year_time * TAU)
-	sun_tilt.rotation.z = sun_tilt_angle
+	sun_tilt.rotation.x = sun_tilt_angle
 	
 	# calculate day time
 	time += time_change
@@ -49,7 +49,7 @@ func _process(delta: float) -> void:
 		time = 0
 	# sun rotation
 	var sun_angle = TAU * time
-	sun.rotation.x = sun_angle
+	sun.rotation.z = sun_angle
 	
 	# calculate moon time
 	moon_time += time_change / moon_cycle
@@ -57,7 +57,7 @@ func _process(delta: float) -> void:
 		moon_time = 0
 	# the extra sun angle gives it somewhat realisic feel
 	# so that sometimes the moon can be seen in the day
-	moon.rotation.x = moon_time * TAU + sun_angle
+	moon.rotation.z = moon_time * TAU + sun_angle
 	
 	
 	
