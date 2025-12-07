@@ -5,7 +5,10 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gr5xt"]
 shader = ExtResource("1_gr5xt")
-shader_parameter/skyColor = Color(0.40432602, 0.4500072, 0.72233397, 1)
+shader_parameter/sun_rotation = Vector3(0, 0, 0)
+shader_parameter/sunTint = Color(0.99795026, 0.96610767, 0, 1)
+shader_parameter/zenithColor = Color(0.007843138, 0.003921569, 0.06666667, 1)
+shader_parameter/horizonColor = Color(0.11764706, 0.11764706, 0.16470589, 1)
 
 [sub_resource type="Sky" id="Sky_dptxg"]
 sky_material = SubResource("ShaderMaterial_gr5xt")
@@ -25,20 +28,20 @@ script = ExtResource("2_dptxg")
 
 [node name="sun" type="Node3D" parent="sun_tilt"]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="sun_tilt/sun"]
+[node name="sun_light" type="DirectionalLight3D" parent="sun_tilt/sun"]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
+
+[node name="sun_mesh" type="MeshInstance3D" parent="sun_tilt/sun"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
 mesh = SubResource("SphereMesh_gr5xt")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="sun_tilt/sun/MeshInstance3D"]
 
 [node name="moon_tilt" type="Node3D" parent="."]
 
 [node name="moon" type="Node3D" parent="moon_tilt"]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="moon_tilt/moon"]
+[node name="moon_light" type="DirectionalLight3D" parent="moon_tilt/moon"]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 5, 0)
+
+[node name="moon_mesh" type="MeshInstance3D" parent="moon_tilt/moon"]
 transform = Transform3D(0.7, 0, 0, 0, -3.059797e-08, -0.7, 0, 0.7, -3.059797e-08, 0, 5, 0)
 mesh = SubResource("SphereMesh_gr5xt")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="moon_tilt/moon/MeshInstance3D"]
-transform = Transform3D(1, 0, 0, 0, -1, -8.742278e-08, 0, 8.742278e-08, -1, 0, 0, 0)
-light_energy = 0.12

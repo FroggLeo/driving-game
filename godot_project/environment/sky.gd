@@ -1,7 +1,7 @@
 extends WorldEnvironment
 
 # seconds in a day
-@export var day_length: float = 10
+@export var day_length: float = 0.5
 
 # days to take the moon to do one cycle, from full moon to full moon
 @export var moon_length: float = 29.5
@@ -17,13 +17,21 @@ extends WorldEnvironment
 @export var moon_axial_tilt: float = 5.0
 # tilt of the equinox from the vertical, or the degree of the latitude
 # 34 degrees is around los angeles's equinox
-@export var latitude = 34
+@export var latitude: float = 34
+
+# energy of the sunlight
+@export var sun_energy: float = 1.0
+# moonlight
+# max fraction of the reflected sunlight @ full moon, 0 to 1
+@export var moon_energy: float = 0.136
 
 # nodes used
 @onready var sun = $sun_tilt/sun
 @onready var moon = $moon_tilt/moon
 @onready var sun_tilt = $sun_tilt
 @onready var moon_tilt = $moon_tilt
+@onready var sun_light = $sun_tilt/sun/sun_light
+@onready var moon_light = $moon_tilt/moon/moon_light
 
 # all from 0 to 1
 # this is the initial amounts when the game starts
@@ -41,6 +49,8 @@ func _ready() -> void:
 	# set the tilt of the equinox
 	sun.rotation.x = deg_to_rad(latitude)
 	moon.rotation.x = deg_to_rad(latitude)
+	# set the initial sun energy
+	sun_light.light_energy = sun_energy
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -76,9 +86,12 @@ func _process(delta: float) -> void:
 	# so that sometimes the moon can be seen in the day
 	var moon_angle = TAU * moon_time
 	moon.rotation.z = moon_angle + sun_angle
+	# moon light energy
+	# make sure to place the sun and moon meshes opposite of each other
+	moon_light.light_energy = sun_energy * moon_energy * absf(2 * (0.5 - moon_time))
 	
 	# sun tilt
-	# using sin so that it goes from -1 to 1 instead of 0 to 1
+	# using sin so that it goes from 1 to -1 to 1 instead of 0 to 1
 	# trig...
 	var sun_tilt_angle = deg_to_rad(axial_tilt) * sin(year_time * TAU)
 	sun_tilt.rotation.x = sun_tilt_angle
