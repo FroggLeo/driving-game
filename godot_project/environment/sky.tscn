@@ -21,20 +21,26 @@ ambient_light_source = 3
 environment = SubResource("Environment_py8sg")
 script = ExtResource("2_dptxg")
 
-[node name="sun" type="Node3D" parent="."]
+[node name="sun_tilt" type="Node3D" parent="."]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="sun"]
+[node name="sun" type="Node3D" parent="sun_tilt"]
+transform = Transform3D(0.81915206, -0.57357645, 0, 0.57357645, 0.81915206, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="sun_tilt/sun"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
 mesh = SubResource("SphereMesh_gr5xt")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="sun/MeshInstance3D"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="sun_tilt/sun/MeshInstance3D"]
 
-[node name="moon" type="Node3D" parent="."]
+[node name="moon_tilt" type="Node3D" parent="."]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="moon"]
+[node name="moon" type="Node3D" parent="moon_tilt"]
+transform = Transform3D(0.81915206, 0.57357645, 0, -0.57357645, 0.81915206, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="moon_tilt/moon"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 5, 0)
 mesh = SubResource("SphereMesh_gr5xt")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="moon/MeshInstance3D"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="moon_tilt/moon/MeshInstance3D"]
 transform = Transform3D(1, 0, 0, 0, -1, -8.742278e-08, 0, 8.742278e-08, -1, 0, 0, 0)
 light_energy = 0.12
