@@ -25,10 +25,10 @@ void sky() {
 	
 	vec3 sun_direction = normalize(sun_rotation);
 	
-	float towards_sun = max(dot(direction, sun_direction), 0.0);
-	float sun_factor = pow(towards_sun, 50.0);
+	float towards_sun = max(dot(direction, sun_direction), 0);
+	float sun_factor = pow(towards_sun, 90.0);
 	
 	color = mix(color, sunTint, sun_factor);
-	COLOR = color;
+	COLOR = EYEDIR;
 }
 

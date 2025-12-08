@@ -1,8 +1,8 @@
 extends WorldEnvironment
 
+@export_category("Time lengths")
 # seconds in a day
-@export var day_length: float = 0.5
-
+@export var day_length: float = 10
 # days to take the moon to do one cycle, from full moon to full moon
 @export var moon_length: float = 29.5
 # days in a year
@@ -11,6 +11,7 @@ extends WorldEnvironment
 # just called it a moon season
 @export var moon_season_length: float = 18.6
 
+@export_category("Tilt of the sun and moon")
 # tilt of the sun, axial tilt, difference between equinox and summer/winter solstice
 @export var axial_tilt: float = 23.5
 # tilt of the moon relative to the sun
@@ -19,6 +20,7 @@ extends WorldEnvironment
 # 34 degrees is around los angeles's equinox
 @export var latitude: float = 34
 
+@export_category("Sun and moon energy")
 # energy of the sunlight
 @export var sun_energy: float = 1.0
 # moonlight
@@ -33,16 +35,17 @@ extends WorldEnvironment
 @onready var sun_light = $sun_tilt/sun/sun_light
 @onready var moon_light = $moon_tilt/moon/moon_light
 
+@export_category("Initial time")
 # all from 0 to 1
 # this is the initial amounts when the game starts
 # the initial time
-@export var time: float = 0
+@export_range(0,1,0.001) var time: float = 0
 # the moon's rotation
-@export var moon_time: float = 0
+@export_range(0,1,0.001) var moon_time: float = 0
 # the time of the year
-@export var year_time: float = 0
+@export_range(0,1,0.001) var year_time: float = 0
 # time of the moon season
-@export var moon_season: float = 0
+@export_range(0,1,0.001) var moon_season: float = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

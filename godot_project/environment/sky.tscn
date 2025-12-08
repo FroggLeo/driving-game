@@ -1,11 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://cmvvu0pixwdta"]
+[gd_scene load_steps=10 format=3 uid="uid://cmvvu0pixwdta"]
 
 [ext_resource type="Shader" uid="uid://c74ktvjqn23l7" path="res://environment/sky.gdshader" id="1_gr5xt"]
 [ext_resource type="Script" uid="uid://bhq4nv4os3os0" path="res://environment/sky.gd" id="2_dptxg"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gr5xt"]
 shader = ExtResource("1_gr5xt")
-shader_parameter/sun_rotation = Vector3(0, 0, 0)
+shader_parameter/sun_rotation = Vector3(0, 0, 1)
 shader_parameter/sunTint = Color(0.99795026, 0.96610767, 0, 1)
 shader_parameter/zenithColor = Color(0.007843138, 0.003921569, 0.06666667, 1)
 shader_parameter/horizonColor = Color(0.11764706, 0.11764706, 0.16470589, 1)
@@ -18,7 +18,17 @@ background_mode = 2
 sky = SubResource("Sky_dptxg")
 ambient_light_source = 3
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t5sdn"]
+emission_enabled = true
+emission = Color(0.912492, 0.88073415, 0.5395693, 1)
+
 [sub_resource type="SphereMesh" id="SphereMesh_gr5xt"]
+material = SubResource("StandardMaterial3D_t5sdn")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rdg10"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_kpmkc"]
+material = SubResource("StandardMaterial3D_rdg10")
 
 [node name="sky" type="WorldEnvironment"]
 environment = SubResource("Environment_py8sg")
@@ -44,4 +54,4 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 5
 
 [node name="moon_mesh" type="MeshInstance3D" parent="moon_tilt/moon"]
 transform = Transform3D(0.7, 0, 0, 0, -3.059797e-08, -0.7, 0, 0.7, -3.059797e-08, 0, 5, 0)
-mesh = SubResource("SphereMesh_gr5xt")
+mesh = SubResource("SphereMesh_kpmkc")
