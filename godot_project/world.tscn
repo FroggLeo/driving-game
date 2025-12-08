@@ -37,3 +37,7 @@ shape = SubResource("BoxShape3D_fj7yv")
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -0.5, 0)
 
 [node name="sky" parent="." instance=ExtResource("3_tlwt5")]
+time = 0.583
+moon_time = 0.6595336192090081
+year_time = 0.5266286200000139
+moon_season = 0.361

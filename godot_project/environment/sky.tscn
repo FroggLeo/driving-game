@@ -1,37 +1,30 @@
-[gd_scene load_steps=10 format=3 uid="uid://cmvvu0pixwdta"]
+[gd_scene load_steps=9 format=3 uid="uid://cmvvu0pixwdta"]
 
-[ext_resource type="Shader" uid="uid://c74ktvjqn23l7" path="res://environment/sky.gdshader" id="1_gr5xt"]
 [ext_resource type="Script" uid="uid://bhq4nv4os3os0" path="res://environment/sky.gd" id="2_dptxg"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_gr5xt"]
-shader = ExtResource("1_gr5xt")
-shader_parameter/sun_rotation = Vector3(0, 0, 1)
-shader_parameter/sunTint = Color(0.99795026, 0.96610767, 0, 1)
-shader_parameter/zenithColor = Color(0.007843138, 0.003921569, 0.06666667, 1)
-shader_parameter/horizonColor = Color(0.11764706, 0.11764706, 0.16470589, 1)
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_vlds3"]
 
-[sub_resource type="Sky" id="Sky_dptxg"]
-sky_material = SubResource("ShaderMaterial_gr5xt")
+[sub_resource type="Sky" id="Sky_t5sdn"]
+sky_material = SubResource("PhysicalSkyMaterial_vlds3")
 
-[sub_resource type="Environment" id="Environment_py8sg"]
+[sub_resource type="Environment" id="Environment_rdg10"]
 background_mode = 2
-sky = SubResource("Sky_dptxg")
-ambient_light_source = 3
+sky = SubResource("Sky_t5sdn")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t5sdn"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kpmkc"]
 emission_enabled = true
 emission = Color(0.912492, 0.88073415, 0.5395693, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_gr5xt"]
-material = SubResource("StandardMaterial3D_t5sdn")
+material = SubResource("StandardMaterial3D_kpmkc")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rdg10"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_djljc"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_kpmkc"]
-material = SubResource("StandardMaterial3D_rdg10")
+material = SubResource("StandardMaterial3D_djljc")
 
 [node name="sky" type="WorldEnvironment"]
-environment = SubResource("Environment_py8sg")
+environment = SubResource("Environment_rdg10")
 script = ExtResource("2_dptxg")
 
 [node name="sun_tilt" type="Node3D" parent="."]

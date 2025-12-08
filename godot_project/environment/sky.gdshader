@@ -29,6 +29,6 @@ void sky() {
 	float sun_factor = pow(towards_sun, 90.0);
 	
 	color = mix(color, sunTint, sun_factor);
-	COLOR = EYEDIR;
+	COLOR = color;
 }
 
