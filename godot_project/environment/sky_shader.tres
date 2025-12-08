@@ -1,0 +1,9 @@
+[gd_resource type="PhysicalSkyMaterial" format=3 uid="uid://bkvdhlri11df5"]
+
+[resource]
+rayleigh_color = Color(0.0806, 0.26938996, 0.62, 1)
+mie_coefficient = 0.02
+mie_eccentricity = 0.95
+mie_color = Color(1, 0.5388553, 0.42263678, 1)
+turbidity = 2.2
+energy_multiplier = 3.0

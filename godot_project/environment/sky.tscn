@@ -1,11 +1,10 @@
 [gd_scene load_steps=9 format=3 uid="uid://cmvvu0pixwdta"]
 
+[ext_resource type="Material" uid="uid://bkvdhlri11df5" path="res://environment/sky_shader.tres" id="1_t5sdn"]
 [ext_resource type="Script" uid="uid://bhq4nv4os3os0" path="res://environment/sky.gd" id="2_dptxg"]
 
-[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_vlds3"]
-
 [sub_resource type="Sky" id="Sky_t5sdn"]
-sky_material = SubResource("PhysicalSkyMaterial_vlds3")
+sky_material = ExtResource("1_t5sdn")
 
 [sub_resource type="Environment" id="Environment_rdg10"]
 background_mode = 2
@@ -28,6 +27,7 @@ environment = SubResource("Environment_rdg10")
 script = ExtResource("2_dptxg")
 
 [node name="sun_tilt" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.1414715, 0.9899423, 0, -0.9899423, -0.1414715, 0, 0, 0)
 
 [node name="sun" type="Node3D" parent="sun_tilt"]
 
@@ -39,6 +39,7 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -
 mesh = SubResource("SphereMesh_gr5xt")
 
 [node name="moon_tilt" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.79457366, 0.6071678, 0, -0.6071678, -0.79457366, 0, 0, 0)
 
 [node name="moon" type="Node3D" parent="moon_tilt"]
 

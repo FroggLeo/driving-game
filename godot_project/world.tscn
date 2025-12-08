@@ -19,6 +19,11 @@ size = Vector3(10, 1, 10)
 
 [node name="World" type="Node3D"]
 
+[node name="sky" parent="." instance=ExtResource("3_tlwt5")]
+time = 0.78
+year_time = 0.32
+moon_season = 0.01
+
 [node name="floor" type="StaticBody3D" parent="."]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 1, 0)
 physics_material_override = SubResource("PhysicsMaterial_gv5m4")
@@ -35,9 +40,3 @@ shape = SubResource("BoxShape3D_fj7yv")
 
 [node name="CharacterBody3D" parent="." instance=ExtResource("1_f3sb7")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, -0.5, 0)
-
-[node name="sky" parent="." instance=ExtResource("3_tlwt5")]
-time = 0.583
-moon_time = 0.6595336192090081
-year_time = 0.5266286200000139
-moon_season = 0.361
