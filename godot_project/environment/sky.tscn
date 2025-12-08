@@ -1,10 +1,22 @@
-[gd_scene load_steps=9 format=3 uid="uid://cmvvu0pixwdta"]
+[gd_scene load_steps=10 format=3 uid="uid://cmvvu0pixwdta"]
 
-[ext_resource type="Material" uid="uid://bkvdhlri11df5" path="res://environment/sky_shader.tres" id="1_t5sdn"]
+[ext_resource type="Shader" uid="uid://ca58wpfd1jknh" path="res://environment/sky_physical_modified.gdshader" id="1_t5sdn"]
 [ext_resource type="Script" uid="uid://bhq4nv4os3os0" path="res://environment/sky.gd" id="2_dptxg"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rdg10"]
+shader = ExtResource("1_t5sdn")
+shader_parameter/rayleigh = 2.0
+shader_parameter/rayleigh_color = Color(0.175, 0.41, 0.999, 1)
+shader_parameter/mie = 0.005
+shader_parameter/mie_eccentricity = 0.8
+shader_parameter/mie_color = Color(0.9, 0.9, 0.9, 1)
+shader_parameter/turbidity = 3.0
+shader_parameter/sun_disk_scale = 0.53
+shader_parameter/ground_color = Color(0.18, 0.18, 0.18, 1)
+shader_parameter/exposure = 1.0
+
 [sub_resource type="Sky" id="Sky_t5sdn"]
-sky_material = ExtResource("1_t5sdn")
+sky_material = SubResource("ShaderMaterial_rdg10")
 
 [sub_resource type="Environment" id="Environment_rdg10"]
 background_mode = 2
@@ -25,14 +37,17 @@ material = SubResource("StandardMaterial3D_djljc")
 [node name="sky" type="WorldEnvironment"]
 environment = SubResource("Environment_rdg10")
 script = ExtResource("2_dptxg")
+sun_energy = 1.0
 
 [node name="sun_tilt" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -0.5854105, 0.81073684, 0, -0.81073684, -0.5854105, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 0.9999999, 0, 0, 0, 0.9999999, 0, 0, 0)
 
 [node name="sun" type="Node3D" parent="sun_tilt"]
+transform = Transform3D(1, 0, 0, 0, 0.8290376, -0.5591929, 0, 0.5591929, 0.8290376, 0, 0, 0)
 
 [node name="sun_light" type="DirectionalLight3D" parent="sun_tilt/sun"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
+light_volumetric_fog_energy = 2.0
 
 [node name="sun_mesh" type="MeshInstance3D" parent="sun_tilt/sun"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
@@ -41,6 +56,7 @@ mesh = SubResource("SphereMesh_gr5xt")
 [node name="moon_tilt" type="Node3D" parent="."]
 
 [node name="moon" type="Node3D" parent="moon_tilt"]
+transform = Transform3D(1, 0, 0, 0, 0.8290376, -0.5591929, 0, 0.5591929, 0.8290376, 0, 0, 0)
 
 [node name="moon_light" type="DirectionalLight3D" parent="moon_tilt/moon"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 5, 0)

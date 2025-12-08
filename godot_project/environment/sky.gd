@@ -32,7 +32,7 @@ extends WorldEnvironment
 
 @export_category("Sun and moon energy")
 # energy of the sunlight
-@export var sun_energy: float = 1.0
+@export var sun_energy: float = 10.0
 # moonlight
 # max fraction of the reflected sunlight @ full moon, 0 to 1
 @export var moon_energy: float = 0.136

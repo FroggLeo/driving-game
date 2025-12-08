@@ -9,10 +9,9 @@ gradient = SubResource("Gradient_rhrpy")
 fill_from = Vector2(1, 1)
 
 [resource]
-rayleigh_color = Color(0.29400003, 0.4998, 0.98, 1)
+rayleigh_color = Color(0.29400003, 0.5912667, 0.98, 1)
 mie_coefficient = 0.02
 mie_eccentricity = 0.95
-mie_color = Color(1, 0.8114337, 0.7627819, 1)
+mie_color = Color(1, 0.88266665, 0.84000003, 1)
 turbidity = 2.2
-energy_multiplier = 3.0
 night_sky = SubResource("GradientTexture2D_j5yi2")
