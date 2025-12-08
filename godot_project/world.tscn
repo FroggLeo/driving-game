@@ -20,7 +20,8 @@ size = Vector3(10, 1, 10)
 [node name="World" type="Node3D"]
 
 [node name="sky" parent="." instance=ExtResource("3_tlwt5")]
-time = 0.78
+day_length = 120.0
+time = 0.349
 year_time = 0.32
 moon_season = 0.01
 

@@ -27,7 +27,7 @@ environment = SubResource("Environment_rdg10")
 script = ExtResource("2_dptxg")
 
 [node name="sun_tilt" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -0.1414715, 0.9899423, 0, -0.9899423, -0.1414715, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.5854105, 0.81073684, 0, -0.81073684, -0.5854105, 0, 0, 0)
 
 [node name="sun" type="Node3D" parent="sun_tilt"]
 
@@ -39,7 +39,6 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -
 mesh = SubResource("SphereMesh_gr5xt")
 
 [node name="moon_tilt" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -0.79457366, 0.6071678, 0, -0.6071678, -0.79457366, 0, 0, 0)
 
 [node name="moon" type="Node3D" parent="moon_tilt"]
 
