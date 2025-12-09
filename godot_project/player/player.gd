@@ -6,7 +6,7 @@ var first_person: bool
 func _ready():
 	%third_person_spring.spring_length = 0
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	$first_person_cam.make_current()
+	%first_person_cam.make_current()
 	Global.paused = false
 
 func _unhandled_input(event):
@@ -32,9 +32,9 @@ func _unhandled_input(event):
 	# first person camera movement
 	if event is InputEventMouseMotion and first_person:
 		rotation_degrees.y -= event.relative.x * Global.sensitivity
-		$first_person_cam.rotation_degrees.x -= event.relative.y * Global.sensitivity
+		%first_person_cam.rotation_degrees.x -= event.relative.y * Global.sensitivity
 		# limits for vertical rotation
-		$first_person_cam.rotation_degrees.x = clamp($first_person_cam.rotation_degrees.x, -80, 80)
+		%first_person_cam.rotation_degrees.x = clamp(%first_person_cam.rotation_degrees.x, -80, 80)
 	
 	# auto switch camera
 	# TODO match camera rotation when switching cams
@@ -45,7 +45,7 @@ func _unhandled_input(event):
 			$third_person_spring/third_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		elif event.is_action_pressed("zoom_in"):
-			$first_person_cam.make_current()
+			%first_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -88,6 +88,11 @@ func _physics_process(delta):
 	# apply the calculated speeds based on direction
 	velocity.x = direction.x * WALK_SPEED
 	velocity.z = direction.z * WALK_SPEED
+	
+	# TODO fix this bro
+	if not first_person:
+		var player_rotation = atan2(-direction.x, -direction.z)
+		$Node3D.rotation.y = player_rotation
 	
 	# jumping code
 	if not is_on_floor():

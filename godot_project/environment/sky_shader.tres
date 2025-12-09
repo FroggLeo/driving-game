@@ -1,12 +1,4 @@
-[gd_resource type="PhysicalSkyMaterial" load_steps=3 format=3 uid="uid://bkvdhlri11df5"]
-
-[sub_resource type="Gradient" id="Gradient_rhrpy"]
-offsets = PackedFloat32Array(0, 0.49122807)
-colors = PackedColorArray(0, 0, 0, 1, 0.000666666, 0, 0.01, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_j5yi2"]
-gradient = SubResource("Gradient_rhrpy")
-fill_from = Vector2(1, 1)
+[gd_resource type="PhysicalSkyMaterial" format=3 uid="uid://bkvdhlri11df5"]
 
 [resource]
 rayleigh_color = Color(0.29400003, 0.5912667, 0.98, 1)
@@ -14,4 +6,3 @@ mie_coefficient = 0.02
 mie_eccentricity = 0.95
 mie_color = Color(1, 0.88266665, 0.84000003, 1)
 turbidity = 2.2
-night_sky = SubResource("GradientTexture2D_j5yi2")

@@ -6,13 +6,13 @@
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bu0v1"]
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_oul6g"]
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yw30f"]
 albedo_texture = ExtResource("2_g1dw6")
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_sh265"]
 material = SubResource("StandardMaterial3D_yw30f")
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_oul6g"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qjkh3"]
 albedo_texture = ExtResource("2_g1dw6")
@@ -23,17 +23,9 @@ material = SubResource("StandardMaterial3D_qjkh3")
 [node name="player" type="CharacterBody3D"]
 script = ExtResource("1_4flbx")
 
-[node name="first_person_cam" type="Camera3D" parent="."]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_bu0v1")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("CapsuleMesh_sh265")
 
 [node name="third_person_spring" type="SpringArm3D" parent="."]
 unique_name_in_owner = true
@@ -44,6 +36,18 @@ script = ExtResource("2_rkbax")
 [node name="third_person_cam" type="Camera3D" parent="third_person_spring"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.742278e-08, 0, 1)
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="first_person_cam" type="Camera3D" parent="Node3D"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_sh265")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 0.5, 0, 0, 0, 0.6, 0, 1.5, -0.29999998)
 mesh = SubResource("BoxMesh_rkbax")
+skeleton = NodePath("../..")
