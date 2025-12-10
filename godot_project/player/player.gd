@@ -41,12 +41,10 @@ func _unhandled_input(event):
 	if first_person:
 		if event.is_action_pressed("zoom_out"):
 			%third_person_spring.spring_length = Global.zoom_inc
-			#%third_person_spring.set = Vector3(45, 45, 45)
 			%third_person_spring.rotation = %first_person_cam.rotation
 			$third_person_spring/third_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-	elif %third_person_spring.spring_length == Global.zoom_inc:
-		if event.is_action_pressed("zoom_in"):
+		elif get_viewport().get_camera_3d() == $third_person_spring/third_person_cam:
 			rotation.y = %third_person_spring.global_transform.basis.get_euler().y
 			%first_person_cam.rotation.x = %third_person_spring.rotation.x
 			%first_person_cam.rotation.z = %third_person_spring.rotation.z
