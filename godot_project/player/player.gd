@@ -101,8 +101,10 @@ func _physics_process(delta):
 		# 3rd person rotation code
 		if direction.length() > 0.001:
 			var walking_direction = atan2(direction.x,direction.z) + PI
-			player_mesh.global_rotation.y = walking_direction
-			first_person_cam.global_rotation.y = walking_direction
+			var new_direction = lerp_angle(player_mesh.global_rotation.y, walking_direction, 4*delta)
+			player_mesh.global_rotation.y = new_direction
+			first_person_cam.global_rotation.y = new_direction
+		
 	
 	# this line like prevents the player from moving faster when they are going diagonally
 	direction = direction.normalized()
