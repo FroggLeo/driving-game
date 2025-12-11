@@ -1,6 +1,25 @@
 extends CharacterBody3D
 
+@export var walk_speed: float = 2.0
+@export var crouch_speed: float = 1.0
+@export var run_speed: float = 4.0
+@export var gravity: float = 9.81
+@export var jump_velocity: float = 2.7
+@export_range(0.5, 30, 0.5) var max_zoom: float = 10.0 #TODO
+@export_range(0.5, 30, 0.5) var zoom_increment: float = 10.0 #TODO
+@export var sensitivity: float = 0.2 #TODO
+
+@export_category("Enabled features")
+@export var enable_jumping: bool = true
+@export var enable_first_person: bool = true
+@export var enable_third_person: bool = true #TODO
+@export var enable_crouch: bool = true
+@export var enable_run: bool = true
+
 var first_person: bool = false
+var run: bool = false
+var crouch: bool = false
+# var paused = Global.paused
 
 # nodes used
 @onready var first_person_cam = $first_person_cam
@@ -10,7 +29,10 @@ var first_person: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	third_person_spring.spring_length = 0
+	if enable_first_person:
+		third_person_spring.spring_length = 0
+	else:
+		third_person_spring.spring_length = max_zoom / 2
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	first_person_cam.make_current()
 	Global.paused = false
@@ -43,8 +65,18 @@ func _unhandled_input(event):
 		# limits for vertical rotation
 		first_person_cam.rotation_degrees.x = clamp(first_person_cam.rotation_degrees.x, -80, 80)
 	
+	# crouch and sprint/run
+	if event.is_action_pressed("crouch"):
+		crouch = true
+	elif event.is_action_pressed("sprint"):
+		run = true
+	if event.is_action_released("crouch"):
+		crouch = false
+	if event.is_action_released("sprint"):
+		run = false
+	
 	# auto switch camera
-	if first_person:
+	if first_person and enable_third_person:
 		if event.is_action_pressed("zoom_out"):
 			# set the spring length to the smallest allowed
 			third_person_spring.spring_length = Global.zoom_inc
@@ -70,9 +102,7 @@ func _unhandled_input(event):
 
 # movement code
 func _physics_process(delta):
-	const WALK_SPEED = 2
-	const GRAVITY = 9.81
-	const JUMP_VELOCITY = 2.7
+	
 	
 	if Global.paused:
 		return
@@ -83,6 +113,7 @@ func _physics_process(delta):
 	var direction
 	var input_direction_3D = Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
 	
+	# calculate direction
 	if first_person:
 		# gets the player rotation
 		direction = transform.basis * input_direction_3D
@@ -110,16 +141,26 @@ func _physics_process(delta):
 	
 	# this line like prevents the player from moving faster when they are going diagonally
 	direction = direction.normalized()
-	# apply the calculated speeds based on direction
-	velocity.x = direction.x * WALK_SPEED
-	velocity.z = direction.z * WALK_SPEED
+	
+	if crouch and enable_crouch:
+		velocity.x = direction.x * crouch_speed
+		velocity.z = direction.z * crouch_speed
+	elif run and enable_run:
+		velocity.x = direction.x * run_speed
+		velocity.z = direction.z * run_speed
+	else:
+		# apply the calculated speeds based on direction
+		velocity.x = direction.x * walk_speed
+		velocity.z = direction.z * walk_speed
+	
 	
 	# jumping code
-	if not is_on_floor():
-		velocity.y -= GRAVITY * delta
-	elif Input.is_action_just_pressed("jump") and velocity.y == 0:
-		velocity.y = JUMP_VELOCITY
-	else:
-		velocity.y = 0
+	if enable_jumping:
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+		elif Input.is_action_just_pressed("jump") and velocity.y == 0:
+			velocity.y = jump_velocity
+		else:
+			velocity.y = 0
 	
 	move_and_slide()

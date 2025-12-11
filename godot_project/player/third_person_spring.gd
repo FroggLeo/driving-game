@@ -14,7 +14,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Global.paused:
 		return
 	
-	first_person = %third_person_spring.spring_length == 0
+	first_person = %third_person_spring.spring_length <= 0
 	if first_person:
 		return
 	
