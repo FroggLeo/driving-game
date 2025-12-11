@@ -32,6 +32,7 @@ func _unhandled_input(event):
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 			Global.paused = true
 	
+	# skip if paused
 	if Global.paused:
 		return
 	
@@ -45,12 +46,18 @@ func _unhandled_input(event):
 	# auto switch camera
 	if first_person:
 		if event.is_action_pressed("zoom_out"):
+			# set the spring length to the smallest allowed
 			third_person_spring.spring_length = Global.zoom_inc
 			third_person_spring.rotation = first_person_cam.rotation
 			third_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		elif get_viewport().get_camera_3d() == third_person_cam:
+			# set the rotation of the player to the rotation of the 3rd person cam
 			rotation.y = third_person_spring.global_transform.basis.get_euler().y
+			# reset the rotation of the mesh and first person cam, created by the 3rd person rotation code
+			first_person_cam.global_rotation.y = rotation.y
+			player_mesh.global_rotation.y = rotation.y
+			# match the rotation of the 3rd person cam
 			first_person_cam.rotation.x = third_person_spring.rotation.x
 			first_person_cam.rotation.z = third_person_spring.rotation.z
 			first_person_cam.make_current()
@@ -70,8 +77,7 @@ func _physics_process(delta):
 	if Global.paused:
 		return
 	
-	# movement code or something
-	# TODO rotate player in the moving direction
+	# more movement code or something
 	var input_direction_2D = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction
 	
@@ -93,12 +99,10 @@ func _physics_process(delta):
 		direction = (right * input_direction_2D.x) + (forward * input_direction_2D.y)
 		
 		# 3rd person rotation code
-		# TODO need to make it workkkkkkk
-		if direction.length() > 0.01:
-			# why is it off by 45 degrees??
-			var walking_direction = atan2(direction.x,direction.z)
-			player_mesh.rotation.y = walking_direction
-			first_person_cam.rotation.y = walking_direction
+		if direction.length() > 0.001:
+			var walking_direction = atan2(direction.x,direction.z) + PI
+			player_mesh.global_rotation.y = walking_direction
+			first_person_cam.global_rotation.y = walking_direction
 	
 	# this line like prevents the player from moving faster when they are going diagonally
 	direction = direction.normalized()
