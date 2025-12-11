@@ -78,11 +78,12 @@ func _physics_process(delta):
 		return
 	
 	# more movement code or something
+	# HACK: need to optimize/simplify
 	var input_direction_2D = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction
+	var input_direction_3D = Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
 	
 	if first_person:
-		var input_direction_3D = Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
 		# gets the player rotation
 		direction = transform.basis * input_direction_3D
 		direction.y = 0
@@ -92,8 +93,9 @@ func _physics_process(delta):
 		
 		# only need to do forward and right
 		var forward = cam_rotation.z
-		forward.y = 0
 		var right = cam_rotation.x
+		# keeps the speed the same despite the up down rotation of the camera
+		forward.y = 0
 		right.y = 0
 		
 		direction = (right * input_direction_2D.x) + (forward * input_direction_2D.y)
