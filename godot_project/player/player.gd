@@ -17,8 +17,6 @@ extends CharacterBody3D
 @export var enable_run: bool = true
 
 var first_person: bool = false
-var run: bool = false
-var crouch: bool = false
 # var paused = Global.paused
 
 # nodes used
@@ -34,6 +32,7 @@ func _ready():
 	else:
 		third_person_spring.spring_length = max_zoom / 2
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	third_person_cam.current = false
 	first_person_cam.make_current()
 	Global.paused = false
 
@@ -64,16 +63,6 @@ func _unhandled_input(event):
 		first_person_cam.rotation_degrees.x -= event.relative.y * Global.sensitivity
 		# limits for vertical rotation
 		first_person_cam.rotation_degrees.x = clamp(first_person_cam.rotation_degrees.x, -80, 80)
-	
-	# crouch and sprint/run
-	if event.is_action_pressed("crouch"):
-		crouch = true
-	elif event.is_action_pressed("sprint"):
-		run = true
-	if event.is_action_released("crouch"):
-		crouch = false
-	if event.is_action_released("sprint"):
-		run = false
 	
 	# auto switch camera
 	if first_person and enable_third_person:
@@ -108,9 +97,9 @@ func _physics_process(delta):
 	
 	# more movement code or something
 	# HACK: need to optimize/simplify
-	var input_direction_2D = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var direction
-	var input_direction_3D = Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
+	var input_direction_2D := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	var direction: Vector3
+	var input_direction_3D := Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
 	
 	# calculate direction 
 	if first_person:
@@ -141,10 +130,10 @@ func _physics_process(delta):
 	# this line like prevents the player from moving faster when they are going diagonally
 	direction = direction.normalized()
 	
-	if crouch and enable_crouch:
+	if Input.is_action_pressed("crouch") and enable_crouch:
 		velocity.x = direction.x * crouch_speed
 		velocity.z = direction.z * crouch_speed
-	elif run and enable_run:
+	elif Input.is_action_pressed("sprint") and enable_run:
 		velocity.x = direction.x * run_speed
 		velocity.z = direction.z * run_speed
 	else:
@@ -152,14 +141,12 @@ func _physics_process(delta):
 		velocity.x = direction.x * walk_speed
 		velocity.z = direction.z * walk_speed
 	
-	
 	# jumping code
-	if enable_jumping:
-		if not is_on_floor():
-			velocity.y -= gravity * delta
-		elif Input.is_action_just_pressed("jump") and velocity.y == 0:
-			velocity.y = jump_velocity
-		else:
-			velocity.y = 0
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+	elif Input.is_action_pressed("jump") and velocity.y == 0 and enable_jumping:
+		velocity.y = jump_velocity
+	else:
+		velocity.y = 0
 	
 	move_and_slide()
