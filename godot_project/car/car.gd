@@ -55,6 +55,10 @@ func _physics_process(delta):
 		exit()
 		return
 	
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+	else:
+		velocity.y = 0
 	
 	move_and_slide()
 
