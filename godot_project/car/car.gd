@@ -1,28 +1,50 @@
 extends CharacterBody3D
 
+@export var max_speed: float = 20.0
+@export var acceleration_decel: float = 12.0
+@export var braking_decel: float = 8.0
+@export var rolling_decel: float = 3.0
 
-const SPEED = 5.0
-const JUMP_VELOCITY = 4.5
+@export var gravity: float = 9.81
+@export_range(0.5, 30, 0.5) var third_person_zoom: float = 10.0
 
+var driver: Node = null
+var current_speed: float = 0.0
+var steer_input: float = 0.0
+var first_person: bool = false
+var throttle: bool = false
+var brake: bool = false
 
-func _physics_process(delta: float) -> void:
-	# Add the gravity.
-	if not is_on_floor():
-		velocity += get_gravity() * delta
+# nodes used
+@onready var driver_cam = $driver_cam
+@onready var third_person_cam = $third_person_spring/third_person_cam
+@onready var third_person_spring = $third_person_spring
+@onready var player_mesh = $mesh
+@onready var exit_location = $exit_loc
+@onready var driver_location = $driver_loc
+@onready var enter_area = $enter_area
 
-	# Handle jump.
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	add_to_group("interactable")
+	third_person_spring.spring_length = third_person_zoom
+	driver_cam.current = false
+	third_person_cam.current = false
 
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+func _unhandled_input(event):
+	# skip if paused
+	if Global.paused:
+		return
+	
 
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta: float) -> void:
+#	pass
+
+# movement code
+func _physics_process(delta):
+	if Global.paused:
+		return
+	
+	
 	move_and_slide()
