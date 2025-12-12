@@ -103,7 +103,6 @@ func _unhandled_input(event):
 # movement code
 func _physics_process(delta):
 	
-	
 	if Global.paused:
 		return
 	
@@ -113,7 +112,7 @@ func _physics_process(delta):
 	var direction
 	var input_direction_3D = Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
 	
-	# calculate direction
+	# calculate direction 
 	if first_person:
 		# gets the player rotation
 		direction = transform.basis * input_direction_3D

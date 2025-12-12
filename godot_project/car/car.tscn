@@ -1,0 +1,57 @@
+[gd_scene load_steps=7 format=3 uid="uid://c8rg4afao8hqe"]
+
+[ext_resource type="Script" uid="uid://c4o4i021y0hua" path="res://car/car.gd" id="1_2gitb"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_33qfd"]
+size = Vector3(2, 1, 5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2gitb"]
+size = Vector3(2, 0.8, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_33qfd"]
+size = Vector3(2, 1.8, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2gitb"]
+size = Vector3(1, 1.8, 2)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_dxy33"]
+
+[node name="CharacterBody3D" type="CharacterBody3D"]
+script = ExtResource("1_2gitb")
+
+[node name="mesh" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="mesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.49999997, 0)
+mesh = SubResource("BoxMesh_33qfd")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="mesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, -0.6)
+mesh = SubResource("BoxMesh_2gitb")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.90000004, 0)
+shape = SubResource("BoxShape3D_33qfd")
+
+[node name="enter_area" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="enter_area"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.9, -0.6)
+shape = SubResource("BoxShape3D_2gitb")
+
+[node name="exit_loc" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -1)
+
+[node name="driver_loc" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -1)
+
+[node name="third_person_spring" type="SpringArm3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.5)
+shape = SubResource("SphereShape3D_dxy33")
+spring_length = 5.0
+
+[node name="third_person_cam" type="Camera3D" parent="third_person_spring"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.742278e-08, 0, 5)
+
+[node name="driver_cam" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.3000001, -1)
