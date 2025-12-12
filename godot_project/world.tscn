@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=9 format=3 uid="uid://7grxhc34xo4f"]
 
+[ext_resource type="PackedScene" uid="uid://c8rg4afao8hqe" path="res://car/car.tscn" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
 [ext_resource type="Texture2D" uid="uid://4y8kw5fqwwxu" path="res://addons/kenney_prototype_textures/dark/texture_09.png" id="1_fj7yv"]
 [ext_resource type="PackedScene" uid="uid://cmvvu0pixwdta" path="res://environment/sky.tscn" id="3_tlwt5"]
@@ -19,12 +20,15 @@ size = Vector3(10, 1, 10)
 
 [node name="World" type="Node3D"]
 
+[node name="CharacterBody3D2" parent="." instance=ExtResource("1_aqk2v")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16.091953, 0)
+
 [node name="sky" parent="." instance=ExtResource("3_tlwt5")]
 day_length = 120.0
 sun_energy = 3.0
 time = 0.614
 year_time = 0.32
-moon_season = 0.472
+moon_season = 0.491
 
 [node name="floor" type="StaticBody3D" parent="."]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 1, 0)

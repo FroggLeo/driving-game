@@ -1,4 +1,4 @@
-extends CharacterBody3D
+extends RigidBody3D
 
 @export var max_speed: float = 20.0
 @export var acceleration: float = 12.0
@@ -43,6 +43,10 @@ func _unhandled_input(event):
 #func _process(delta: float) -> void:
 #	pass
 
+# NOTE
+# steering input maps are: throttle, reverse, steer_left, steer_right, brake
+# other include: interact
+
 # movement code
 func _physics_process(delta):
 	if Global.paused:
@@ -55,16 +59,13 @@ func _physics_process(delta):
 		exit()
 		return
 	
-	if not is_on_floor():
-		velocity.y -= gravity * delta
-	else:
-		velocity.y = 0
-	
-	move_and_slide()
 
-func enter() -> void:
+func enter(player: CharacterBody3D) -> void:
 	# TODO set driver to a player?
-	pass
+	# if driver is not occupied
+	# considering multiplayer
+	if driver == null:
+		driver = player
 
 func exit() -> void:
 	# set driver to nothing

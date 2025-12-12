@@ -1,6 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://c8rg4afao8hqe"]
-
-[ext_resource type="Script" uid="uid://c4o4i021y0hua" path="res://car/car.gd" id="1_2gitb"]
+[gd_scene load_steps=6 format=3 uid="uid://c8rg4afao8hqe"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_33qfd"]
 size = Vector3(2, 1, 5)
@@ -16,8 +14,7 @@ size = Vector3(1, 1.8, 2)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_dxy33"]
 
-[node name="CharacterBody3D" type="CharacterBody3D"]
-script = ExtResource("1_2gitb")
+[node name="RigidBody3D" type="RigidBody3D"]
 
 [node name="mesh" type="Node3D" parent="."]
 
@@ -52,6 +49,7 @@ spring_length = 5.0
 
 [node name="third_person_cam" type="Camera3D" parent="third_person_spring"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.742278e-08, 0, 5)
+current = true
 
 [node name="driver_cam" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.3000001, -1)
