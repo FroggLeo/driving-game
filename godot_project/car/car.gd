@@ -3,9 +3,11 @@ extends RigidBody3D
 @export var max_speed: float = 20.0
 
 @export var throttle_force: float = 2000.0
-@export var braking_force: float = 10.0
-@export var rolling_force: float = 4.0
+@export var reverse_force: float = 700.0
+@export var braking_force: float = 1000.0
+@export var rolling_force: float = 400.0
 
+@export var deadzone: float = 0.01
 
 # change in steering per second, steering goes from -1 to 1
 @export var steering_speed: float = 4.0
@@ -41,6 +43,7 @@ func _physics_process(delta):
 	# NOTE
 	# driving input maps are: throttle, reverse, steer_left, steer_right, brake
 	# other include: interact
+	# these should all go from 0 to 1
 	var throttle_input = Input.get_action_strength("throttle")
 	var reverse_input = Input.get_action_strength("brake")
 	var steer_input = Input.get_axis("steer_left", "steer_right")
@@ -48,7 +51,11 @@ func _physics_process(delta):
 	
 	var current_velocity := linear_velocity
 	var current_speed := current_velocity.length()
+	var forward := -global_transform.basis.z
 	
+	if throttle_input > deadzone and current_speed < max_speed:
+		apply_central_force(forward * throttle_input * throttle_force)
+		
 	
 
 func enter(player: CharacterBody3D) -> void:
