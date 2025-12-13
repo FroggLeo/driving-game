@@ -1,4 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://c8rg4afao8hqe"]
+[gd_scene load_steps=7 format=3 uid="uid://c8rg4afao8hqe"]
+
+[ext_resource type="Script" uid="uid://c4o4i021y0hua" path="res://car/car.gd" id="1_2gitb"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_33qfd"]
 size = Vector3(2, 1, 5)
@@ -14,7 +16,8 @@ size = Vector3(1, 1.8, 2)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_dxy33"]
 
-[node name="RigidBody3D" type="RigidBody3D"]
+[node name="car" type="RigidBody3D"]
+script = ExtResource("1_2gitb")
 
 [node name="mesh" type="Node3D" parent="."]
 

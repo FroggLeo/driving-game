@@ -9,11 +9,8 @@ extends RigidBody3D
 @export_range(0.5, 30, 0.5) var third_person_zoom: float = 10.0
 
 var driver: Node = null
-var current_speed: float = 0.0
-var steer_input: float = 0.0
+var current_speed: float
 var first_person: bool = false
-var throttle: bool = false
-var brake: bool = false
 
 # nodes used
 @onready var driver_cam = $driver_cam
@@ -33,31 +30,24 @@ func _ready():
 	driver_cam.current = false
 	third_person_cam.current = false
 
-func _unhandled_input(event):
-	# skip if paused
-	if Global.paused:
-		return
-	
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta: float) -> void:
-#	pass
-
 # NOTE
 # steering input maps are: throttle, reverse, steer_left, steer_right, brake
 # other include: interact
 
 # movement code
 func _physics_process(delta):
-	if Global.paused:
-		return
-	# if there is no driver
-	if driver == null:
+	if Global.paused or driver == null:
 		return
 	
 	if Input.is_action_just_pressed("interact"):
 		exit()
 		return
+	
+	var throttle_input = Input.get_action_strength("throttle")
+	var reverse_input = Input.get_action_strength("brake")
+	var steer_input = Input.get_axis("steer_left", "steer_right")
+	var brake_input = Input.get_action_strength("brake")
+	
 	
 
 func enter(player: CharacterBody3D) -> void:
