@@ -5,14 +5,15 @@ extends CharacterBody3D
 @export var run_speed: float = 4.0
 @export var gravity: float = 9.81
 @export var jump_velocity: float = 2.7
-@export_range(0.5, 30, 0.5) var max_zoom: float = 10.0 #TODO
-@export_range(0.5, 30, 0.5) var zoom_increment: float = 10.0 #TODO
-@export var sensitivity: float = 0.2 #TODO
+@export_range(0.5, 30, 0.5) var max_zoom: float = 10.0
+@export_range(0.5, 10, 0.5) var min_zoom: float = 2.0
+@export_range(0.5, 30, 0.025) var zoom_increment: float = 1.0
+@export_range(0.01, 1, 0.01) var sensitivity: float = 0.2
 
 @export_category("Enabled features")
 @export var enable_jumping: bool = true
 @export var enable_first_person: bool = true
-@export var enable_third_person: bool = true #TODO
+@export var enable_third_person: bool = true
 @export var enable_crouch: bool = true
 @export var enable_run: bool = true
 
@@ -29,18 +30,19 @@ var first_person: bool = false
 func _ready():
 	if enable_first_person:
 		third_person_spring.spring_length = 0
+		third_person_cam.current = false
+		first_person_cam.make_current()
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	else:
 		third_person_spring.spring_length = max_zoom / 2
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	third_person_cam.current = false
-	first_person_cam.make_current()
+		first_person_cam.current = false
+		third_person_cam.make_current()
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	Global.paused = false
 
 func _unhandled_input(event):
-	
-	first_person = third_person_spring.spring_length <= 0
-	
 	# release mouse on cancel event
+	# should make this work with multiplayer, reduce global file as much as possible
 	if event.is_action_pressed("ui_cancel"):
 		if Global.paused:
 			if first_person:
@@ -59,35 +61,20 @@ func _unhandled_input(event):
 	
 	# first person camera movement
 	if event is InputEventMouseMotion and first_person:
-		rotation_degrees.y -= event.relative.x * Global.sensitivity
-		first_person_cam.rotation_degrees.x -= event.relative.y * Global.sensitivity
+		rotation_degrees.y -= event.relative.x * sensitivity
+		first_person_cam.rotation_degrees.x -= event.relative.y * sensitivity
 		# limits for vertical rotation
 		first_person_cam.rotation_degrees.x = clamp(first_person_cam.rotation_degrees.x, -80, 80)
-	
-	# auto switch camera
-	if first_person and enable_third_person:
-		if event.is_action_pressed("zoom_out"):
-			# set the spring length to the smallest allowed
-			third_person_spring.spring_length = Global.zoom_inc
-			third_person_spring.rotation = first_person_cam.rotation
-			third_person_cam.make_current()
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		elif get_viewport().get_camera_3d() == third_person_cam:
-			# set the rotation of the player to the rotation of the 3rd person cam
-			rotation.y = third_person_spring.global_transform.basis.get_euler().y
-			# reset the rotation of the mesh and first person cam, created by the 3rd person rotation code
-			first_person_cam.global_rotation.y = rotation.y
-			player_mesh.global_rotation.y = rotation.y
-			# match the rotation of the 3rd person cam
-			first_person_cam.rotation.x = third_person_spring.rotation.x
-			first_person_cam.rotation.z = third_person_spring.rotation.z
-			first_person_cam.make_current()
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta: float) -> void:
-#	pass
+func _process(delta: float) -> void:
+	if Global.paused:
+		return
+	
+	first_person = third_person_spring.spring_length <= min_zoom and enable_first_person or not enable_third_person
+	
+	if enable_first_person and enable_third_person:
+		switch_cam()
 
 # movement code
 func _physics_process(delta):
@@ -150,3 +137,25 @@ func _physics_process(delta):
 		velocity.y = 0
 	
 	move_and_slide()
+
+# auto switch camera
+func switch_cam() -> void:
+	if first_person:
+		if Input.is_action_just_pressed("zoom_out"):
+			# set the spring length to the smallest allowed
+			third_person_spring.spring_length = zoom_increment
+			third_person_spring.rotation = first_person_cam.rotation
+			third_person_cam.make_current()
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		elif get_viewport().get_camera_3d() == third_person_cam:
+			# set the rotation of the player to the rotation of the 3rd person cam
+			rotation.y = third_person_spring.global_transform.basis.get_euler().y
+			# reset the rotation of the mesh and first person cam, created by the 3rd person rotation code
+			first_person_cam.global_rotation.y = rotation.y
+			player_mesh.global_rotation.y = rotation.y
+			# match the rotation of the 3rd person cam
+			first_person_cam.rotation.x = third_person_spring.rotation.x
+			first_person_cam.rotation.z = third_person_spring.rotation.z
+			first_person_cam.make_current()
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		

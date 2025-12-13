@@ -17,9 +17,7 @@ extends RigidBody3D
 var driver: Node = null
 
 # nodes used
-@onready var driver_cam = $driver_cam
-@onready var third_person_cam = $third_person_spring/third_person_cam
-@onready var third_person_spring = $third_person_spring
+@onready var driver_cam = $markers/driver_cam
 @onready var player_mesh = $mesh
 @onready var exit_location = $markers/exit_loc
 @onready var driver_location = $markers/driver_loc
