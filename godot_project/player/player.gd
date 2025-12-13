@@ -7,7 +7,7 @@ extends CharacterBody3D
 @export var jump_velocity: float = 2.7
 @export_range(0.5, 30, 0.5) var max_zoom: float = 10.0
 @export_range(0.5, 10, 0.5) var min_zoom: float = 2.0
-@export_range(0.5, 30, 0.025) var zoom_increment: float = 1.0
+@export_range(0.5, 5, 0.025) var zoom_increment: float = 1.0
 @export_range(0.01, 1, 0.01) var sensitivity: float = 0.2
 
 @export_category("Enabled features")
@@ -43,7 +43,7 @@ func _ready():
 func _unhandled_input(event):
 	# release mouse on cancel event
 	# should make this work with multiplayer, reduce global file as much as possible
-	if event.is_action_pressed("ui_cancel"):
+	if Input.is_action_just_pressed("ui_cancel"):
 		if Global.paused:
 			if first_person:
 				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
