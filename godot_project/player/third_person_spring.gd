@@ -4,11 +4,16 @@ extends SpringArm3D
 
 var first_person
 var sensitivity
+var zoom_increment
+var max_zoom
+var min_zoom
 var last_mouse_pos: Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
+	zoom_increment = player.zoom_increment
+	max_zoom = player.max_zoom
+	min_zoom = player.min_zoom
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -23,10 +28,6 @@ func _process(delta: float) -> void:
 	
 	# zoom in and out
 	# TODO smooth zoom movement
-	var zoom_increment = player.zoom_increment
-	var max_zoom = player.max_zoom
-	var min_zoom = player.min_zoom
-	
 	if Input.is_action_just_pressed("zoom_in") and spring_length >= min_zoom:
 		spring_length -= zoom_increment
 	elif Input.is_action_just_pressed("zoom_out") and spring_length < max_zoom:
