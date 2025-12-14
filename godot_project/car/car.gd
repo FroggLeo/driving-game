@@ -60,8 +60,12 @@ func enter(player: CharacterBody3D) -> void:
 	# TODO set driver to a player?
 	# if driver is not occupied
 	# considering multiplayer
-	if driver == null:
-		driver = player
+	if driver != null:
+		# implement passenger code here
+		return
+	
+	driver = player
+	
 
 func exit() -> void:
 	# set driver to nothing

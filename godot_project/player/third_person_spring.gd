@@ -11,9 +11,11 @@ var last_mouse_pos: Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# move to _process if need to dynamically update
 	zoom_increment = player.zoom_increment
 	max_zoom = player.max_zoom
 	min_zoom = player.min_zoom
+	sensitivity = player.sensitivity
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -21,7 +23,6 @@ func _process(delta: float) -> void:
 		return
 	
 	first_person = player.first_person
-	sensitivity = player.sensitivity
 	
 	if first_person or not player.enable_third_person:
 		return

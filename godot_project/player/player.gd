@@ -19,8 +19,11 @@ extends CharacterBody3D
 @export var enable_run: bool = true
 
 var first_person: bool = false
-var driving: bool = false
-var driven_car: Node3D = null
+var v_driving: bool = false
+var v_driven: Node3D = null
+var v_seat_loc: Marker3D = null
+var v_fcamera_loc: Marker3D = null # first person cam
+var v_tcamera_loc: Marker3D = null # third person cam
 # var paused = Global.paused
 
 # nodes used
@@ -74,6 +77,11 @@ func _process(delta: float) -> void:
 	if Global.paused:
 		return
 	
+	if v_driving:
+		enable_third_person = false
+		first_person_cam.global_transform = v_fcamera_loc.global_transform
+		first_person_cam.make_current()
+	
 	first_person = third_person_spring.spring_length < min_zoom and enable_first_person or not enable_third_person
 	
 	if enable_first_person and enable_third_person:
@@ -83,6 +91,10 @@ func _process(delta: float) -> void:
 func _physics_process(delta):
 	
 	if Global.paused:
+		return
+	
+	if v_driving:
+		global_transform = v_seat_loc.global_transform
 		return
 	
 	# more movement code or something
@@ -162,3 +174,19 @@ func switch_cam() -> void:
 			first_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 		
+
+# entering a vehicle
+func enter_vehicle(car: Node3D) -> void:
+	v_driving = true
+	v_driven = car
+	v_seat_loc = car.get_seat()
+	v_fcamera_loc = car.get_fcamera()
+	v_tcamera_loc = car.get_tcamera()
+	# no more moving
+	velocity = Vector3(0,0,0)
+	
+	# hide mesh if needed
+	#player_mesh.visible = false
+	
+	global_transform = v_seat_loc.global_transform
+	
