@@ -5,6 +5,7 @@ extends CharacterBody3D
 @export var run_speed: float = 4.0
 @export var gravity: float = 9.81
 @export var jump_velocity: float = 2.7
+@export var player_turn_speed: float = 4.0
 @export_range(0.5, 30, 0.5) var max_zoom: float = 10.0
 @export_range(0.5, 10, 0.5) var min_zoom: float = 2.0
 @export_range(0.5, 5, 0.025) var zoom_increment: float = 1.0
@@ -18,6 +19,8 @@ extends CharacterBody3D
 @export var enable_run: bool = true
 
 var first_person: bool = false
+var driving: bool = false
+var driven_car: Node3D = null
 # var paused = Global.paused
 
 # nodes used
@@ -71,7 +74,7 @@ func _process(delta: float) -> void:
 	if Global.paused:
 		return
 	
-	first_person = third_person_spring.spring_length <= min_zoom and enable_first_person or not enable_third_person
+	first_person = third_person_spring.spring_length < min_zoom and enable_first_person or not enable_third_person
 	
 	if enable_first_person and enable_third_person:
 		switch_cam()
@@ -109,7 +112,7 @@ func _physics_process(delta):
 		# 3rd person rotation code
 		if direction.length() > 0.001:
 			var walking_direction = atan2(direction.x,direction.z) + PI
-			var new_direction = lerp_angle(player_mesh.global_rotation.y, walking_direction, 4*delta)
+			var new_direction = lerp_angle(player_mesh.global_rotation.y, walking_direction, player_turn_speed * delta)
 			player_mesh.global_rotation.y = new_direction
 			first_person_cam.global_rotation.y = new_direction
 		
@@ -128,7 +131,7 @@ func _physics_process(delta):
 		velocity.x = direction.x * walk_speed
 		velocity.z = direction.z * walk_speed
 	
-	# jumping code
+	# jumping and gravity code
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	elif Input.is_action_pressed("jump") and velocity.y == 0 and enable_jumping:
@@ -143,7 +146,7 @@ func switch_cam() -> void:
 	if first_person:
 		if Input.is_action_just_pressed("zoom_out"):
 			# set the spring length to the smallest allowed
-			third_person_spring.spring_length = zoom_increment
+			third_person_spring.spring_length = min_zoom
 			third_person_spring.rotation = first_person_cam.rotation
 			third_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
