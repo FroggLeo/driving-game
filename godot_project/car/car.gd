@@ -56,16 +56,42 @@ func _physics_process(delta):
 		
 	
 
-func enter(player: CharacterBody3D) -> void:
-	# TODO set driver to a player?
-	# if driver is not occupied
-	# considering multiplayer
-	if driver != null:
-		# implement passenger code here
-		return
+func get_open_seat() -> int:
+	if driver == null:
+		return 0
+	return -1
+
+# TODO make it work
+func enter(player: CharacterBody3D, seat: int) -> bool:
+	# if driver is free
+	if driver == null and seat == 0:
+		driver = player
+		return true
 	
-	driver = player
+	# implement passenger code here
+	# return false for unable to enter/already full
 	
+	
+	
+	return false
+
+func get_seat(seat: int) -> Marker3D:
+	if seat == 0:
+		return driver_location
+	else:
+		return driver_location
+
+func get_fcamera(seat: int) -> Marker3D:
+	if seat == 0:
+		return driver_cam
+	else:
+		return driver_cam
+
+func get_tcamera(seat: int) -> Marker3D:
+	if seat == 0:
+		return driver_cam
+	else:
+		return driver_cam
 
 func exit() -> void:
 	# set driver to nothing

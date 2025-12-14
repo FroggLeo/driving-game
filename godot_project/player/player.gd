@@ -176,7 +176,16 @@ func switch_cam() -> void:
 		
 
 # entering a vehicle
+# TODO make it work
 func enter_vehicle(car: Node3D) -> void:
+	var open_seat: int = car.get_open_seat()
+	if open_seat < 0:
+		# can't enter car because returned -1
+		return
+	
+	car.enter(self)
+	
+	
 	v_driving = true
 	v_driven = car
 	v_seat_loc = car.get_seat()
@@ -187,6 +196,7 @@ func enter_vehicle(car: Node3D) -> void:
 	
 	# hide mesh if needed
 	#player_mesh.visible = false
+	
 	
 	global_transform = v_seat_loc.global_transform
 	
