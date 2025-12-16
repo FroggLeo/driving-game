@@ -209,3 +209,25 @@ func enter_vehicle(car: RigidBody3D) -> void:
 	velocity = Vector3.ZERO
 	global_transform = v_seat_mkr.global_transform
 	#player_mesh.visible = false # hide mesh
+
+# exiting a vehicle
+func exit_vehicle(car: RigidBody3D) -> void:
+	if not v_driving:
+		return
+	
+	# try exiting
+	if not car.exit(v_driven_seat):
+		return # if returned false, cannot exit
+	
+	global_transform = v_exit_mkr.global_transform
+	
+	v_driving = false
+	v_driven_car = null
+	v_driven_seat = -1
+	
+	v_seat_mkr = null
+	v_fcam_mkr = null
+	v_tcam_mkr = null
+	v_exit_mkr = null
+	
+	#player_mesh.visible = true # show mesh
