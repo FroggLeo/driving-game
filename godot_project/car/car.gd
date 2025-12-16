@@ -53,45 +53,49 @@ func _physics_process(delta):
 	
 	if throttle_input > deadzone and current_speed < max_speed:
 		apply_central_force(forward * throttle_input * throttle_force)
-		
+	
 	
 
+# gets an open seat in the car, if there is any
+# returns -1 for full car
 func get_open_seat() -> int:
 	if driver == null:
 		return 0
+	
 	return -1
 
-# TODO make it work
+# lets a player enter the car at the specified seat number
 func enter(player: CharacterBody3D, seat: int) -> bool:
 	# if driver is free
 	if driver == null and seat == 0:
 		driver = player
 		return true
 	
-	# implement passenger code here
+	# TODO implement passenger code here
 	# return false for unable to enter/already full
-	
-	
 	
 	return false
 
+# gets the marker of the specified seat
 func get_seat(seat: int) -> Marker3D:
 	if seat == 0:
 		return driver_location
-	else:
-		return driver_location
+	
+	return driver_location
 
+# gets the marker of the first person camera
 func get_fcamera(seat: int) -> Marker3D:
 	if seat == 0:
 		return driver_cam
-	else:
-		return driver_cam
+	
+	return driver_cam
 
+# gets the marker of the third person camera
 func get_tcamera(seat: int) -> Marker3D:
 	if seat == 0:
 		return driver_cam
-	else:
-		return driver_cam
+	
+	return driver_cam
 
 func exit() -> void:
 	# set driver to nothing
