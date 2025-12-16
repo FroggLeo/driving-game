@@ -1,27 +1,53 @@
 extends RigidBody3D
 
-@export var max_speed: float = 20.0
+# tuned to a compact pickup truck w/ 1 row of seats
 
-@export var throttle_force: float = 2000.0
-@export var reverse_force: float = 700.0
-@export var braking_force: float = 1000.0
-@export var rolling_force: float = 400.0
+# using watts to be realistic and have a dynamic top speed
+@export var max_power_watts: float = 35000.0
+# efficiency loss from the engine to the wheels
+@export var drivechain_efficiency: float = 0.85
+# the max traction allowed
+# so that the traction isn't infinite at 0 speed
+@export var max_tractive_force = 4500.0
+# maximum force when braking
+@export var max_brake_force: float = 9000.0
+# natural engine brake force when the petal is lifted
+@export var engine_brake_force: float = 300.0
 
-@export var deadzone: float = 0.01
+# force of the roll is the mass of the car * coef * gravity
+@export var rolling_resistance_coef: float = 200.0
+# aerodynamic drag constant
+@export var drag_coef: float = 0.6
 
-# change in steering per second, steering goes from -1 to 1
-@export var steering_speed: float = 4.0
-
+# mass of the truck in kg
+@export var car_mass: float = 1700.0
+# coefficient of friction of the wheels
+# force laterally, front and back
+@export var lat_cof: float = 0.75
+# force left and right
+@export var long_cof: float = 0.85
+# gravity
 @export var gravity: float = 9.81
 
-var driver: Node = null
+# change in steering per second, steering goes from -1 to 1
+# steering speed when the car is stopped
+@export var steering_speed_00: float = 1.0
+# steering speed at 30m/s
+@export var steering_speed_30: float = 0.4
+
+# dedzone of the input
+@export var deadzone: float = 0.01
 
 # nodes used
-@onready var driver_cam = $markers/driver_cam
-@onready var player_mesh = $mesh
+# arrays should be same length
+@onready var seats: Array[Marker3D] = [$markers/seat_0]
+@onready var fcams: Array[Marker3D] = [$markers/fcam_0]
+@onready var tcams: Array[Marker3D] = [$markers/tcam_0]
+#@onready var car_mesh = $mesh
 @onready var exit_location = $markers/exit_loc
-@onready var driver_location = $markers/driver_loc
 @onready var enter_area = $enter_area
+
+var riders: Array[CharacterBody3D] = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -30,12 +56,7 @@ func _ready():
 
 # movement code
 func _physics_process(delta):
-	if Global.paused or driver == null:
-		return
-	
-	# exit the car
-	if Input.is_action_just_pressed("interact"):
-		exit()
+	if Global.paused:
 		return
 	
 	# NOTE
@@ -51,52 +72,51 @@ func _physics_process(delta):
 	var current_speed := current_velocity.length()
 	var forward := -global_transform.basis.z
 	
-	if throttle_input > deadzone and current_speed < max_speed:
-		apply_central_force(forward * throttle_input * throttle_force)
+	# forward throttle
+	if throttle_input > deadzone:
+		apply_central_force(forward * throttle_input)
 	
 	
 
 # gets an open seat in the car, if there is any
 # returns -1 for full car
 func get_open_seat() -> int:
-	if driver == null:
+	if riders[0] == null:
 		return 0
 	
 	return -1
 
 # lets a player enter the car at the specified seat number
 func enter(player: CharacterBody3D, seat: int) -> bool:
-	# if driver is free
-	if driver == null and seat == 0:
-		driver = player
-		return true
+	# if seat is in range
+	if seat < 0 or seat >= riders.size():
+		return false
+	if riders[seat] == null:
+		return false
+	
+	# NOTE seat locking should be on car or player side?
 	
 	# TODO implement passenger code here
 	# return false for unable to enter/already full
 	
 	return false
 
+# drops the player at specified seat
+func exit(seat: int) -> bool:
+	if seat < 0 or seat >= riders.size():
+		return false
+	if riders[seat] == null:
+		return false
+	
+	riders[seat] = null
+	return true
+
 # gets the marker of the specified seat
 func get_seat(seat: int) -> Marker3D:
-	if seat == 0:
-		return driver_location
-	
-	return driver_location
-
+	return seats[seat]
 # gets the marker of the first person camera
-func get_fcamera(seat: int) -> Marker3D:
-	if seat == 0:
-		return driver_cam
-	
-	return driver_cam
-
+func get_fcam(seat: int) -> Marker3D:
+	return fcams[seat]
 # gets the marker of the third person camera
-func get_tcamera(seat: int) -> Marker3D:
-	if seat == 0:
-		return driver_cam
-	
-	return driver_cam
-
-func exit() -> void:
-	# set driver to nothing
-	driver = null
+func get_tcam(seat: int) -> Marker3D:
+	return tcams[seat]
