@@ -21,9 +21,9 @@ extends CharacterBody3D
 var first_person: bool = false
 
 # interacting stuff
-var i_node: Node = null
-var i_type # TODO
-var i_distance # TODO
+var i_object: Node = null
+var i_origin: Marker3D = null
+var i_type: String = ""
 var i_message: String = ""
 
 # drivng stuff
@@ -181,6 +181,33 @@ func switch_cam() -> void:
 			first_person_cam.rotation.z = third_person_spring.rotation.z
 			first_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+# set the thing that player that can interact with
+# TODO clear object when too far away
+func set_interactable(object: Node, origin: Marker3D, type: String, message: String) -> void:
+	if i_object == object:
+		return
+	if object == null:
+		i_object = object
+		i_origin = origin
+		i_type = type
+		i_message = message
+		return
+	# pick the closest interactable
+	var original_distance := global_transform.origin.distance_to(i_origin.global_transform.origin)
+	var new_distance := global_transform.origin.distance_to(origin.global_transform.origin)
+	if new_distance < original_distance:
+		i_object = object
+		i_origin = origin
+		i_type = type
+		i_message = message
+
+func clear_interactable(object: Node) -> void:
+	if i_object == object:
+		i_object = null
+		i_origin = null
+		i_type = ""
+		i_message = ""
 
 # entering a vehicle
 func enter_vehicle(car: RigidBody3D) -> void:
