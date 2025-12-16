@@ -46,20 +46,19 @@ extends RigidBody3D
 @onready var fcam_mkrs: Array[Marker3D] = [$markers/fcam_0]
 @onready var tcam_mkrs: Array[Marker3D] = [$markers/tcam_0]
 @onready var enter_area = $enter_area
+@onready var enter_orig = $enter_area/enter_origin
 #@onready var car_mesh = $mesh
 
 var riders: Array[CharacterBody3D] = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# add to a group so it can be interacted by the player
-	add_to_group("interactable")
 	riders.resize(seat_mkrs.size())
+	enter_area.body_entered.connect(_body_entered)
+	enter_area.body_entered.connect(_body_exited)
 
 # movement code
 func _physics_process(delta):
-	if Global.paused:
-		return
 	
 	# NOTE
 	# driving input maps are: throttle, reverse, steer_left, steer_right, brake
@@ -92,6 +91,14 @@ func _physics_process(delta):
 	if brake_input > deadzone:
 		pass
 
+func _body_entered(body: Node) -> void:
+	if body is CharacterBody3D and body.has_method("set_interactable"):
+		body.set_interactable(self, enter_orig, "car", "Enter")
+
+func _body_exited(body: Node) -> void:
+	if body is CharacterBody3D and body.has_method("set_interactable"):
+		body.clear_interactable(self)
+
 # gets an open seat in the car, if there is any
 # returns -1 for full car
 func get_open_seat() -> int:
@@ -105,7 +112,7 @@ func enter(player: CharacterBody3D, seat: int) -> bool:
 	# if seat is in range
 	if seat < 0 or seat >= riders.size():
 		return false
-	if riders[seat] == null:
+	if riders[seat] != null:
 		return false
 	
 	riders[seat] = player
