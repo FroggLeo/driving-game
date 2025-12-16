@@ -37,13 +37,16 @@ shape = SubResource("BoxShape3D_33qfd")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.9, -0.6)
 shape = SubResource("BoxShape3D_2gitb")
 
+[node name="enter_origin" type="Marker3D" parent="enter_area"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
+
 [node name="markers" type="Node3D" parent="."]
 
-[node name="driver_cam" type="Marker3D" parent="markers"]
+[node name="fcam_0" type="Marker3D" parent="markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.3999999, -1)
 
-[node name="exit_loc" type="Marker3D" parent="markers"]
+[node name="exit_0" type="Marker3D" parent="markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -1)
 
-[node name="driver_loc" type="Marker3D" parent="markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -1)
+[node name="seat_0" type="Marker3D" parent="markers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)

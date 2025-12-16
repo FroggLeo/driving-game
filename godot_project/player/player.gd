@@ -183,7 +183,6 @@ func switch_cam() -> void:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 # set the thing that player that can interact with
-# TODO clear object when too far away
 func set_interactable(object: Node, origin: Marker3D, type: String, message: String) -> void:
 	if i_object == object:
 		return
