@@ -1,6 +1,7 @@
 extends RigidBody3D
 
 # tuned to a compact pickup truck w/ 1 row of seats
+# NOT kei truck!!! legal in america!!!
 
 # using watts to be realistic and have a dynamic top speed
 @export var max_power_watts: float = 35000.0
@@ -40,12 +41,12 @@ extends RigidBody3D
 
 # nodes used
 # arrays should be same length
-@onready var seats: Array[Marker3D] = [$markers/seat_0]
-@onready var fcams: Array[Marker3D] = [$markers/fcam_0]
-@onready var tcams: Array[Marker3D] = [$markers/tcam_0]
-#@onready var car_mesh = $mesh
-@onready var exit_location = $markers/exit_loc
+@onready var seat_mkrs: Array[Marker3D] = [$markers/seat_0]
+@onready var exit_mkrs: Array[Marker3D] = [$markers/exit_0]
+@onready var fcam_mkrs: Array[Marker3D] = [$markers/fcam_0]
+@onready var tcam_mkrs: Array[Marker3D] = [$markers/tcam_0]
 @onready var enter_area = $enter_area
+#@onready var car_mesh = $mesh
 
 var riders: Array[CharacterBody3D] = []
 
@@ -53,6 +54,7 @@ var riders: Array[CharacterBody3D] = []
 func _ready():
 	# add to a group so it can be interacted by the player
 	add_to_group("interactable")
+	riders.resize(seat_mkrs.size())
 
 # movement code
 func _physics_process(delta):
@@ -64,26 +66,38 @@ func _physics_process(delta):
 	# other include: interact
 	# these should all go from 0 to 1
 	var throttle_input = Input.get_action_strength("throttle")
-	var reverse_input = Input.get_action_strength("brake")
+	var reverse_input = Input.get_action_strength("reverse")
 	var steer_input = Input.get_axis("steer_left", "steer_right")
 	var brake_input = Input.get_action_strength("brake")
 	
 	var current_velocity := linear_velocity
 	var current_speed := current_velocity.length()
-	var forward := -global_transform.basis.z
+	var car_direction := -global_transform.basis.z
 	
 	# forward throttle
 	if throttle_input > deadzone:
-		apply_central_force(forward * throttle_input)
+		pass
 	
+	# reverse throttle
+	# reverse will simply apply a negative force to 'brake'
+	# instead of braking then reverse
+	if reverse_input > deadzone:
+		pass
 	
+	# steer
+	if abs(steer_input) > deadzone:
+		pass
+	
+	# brake
+	if brake_input > deadzone:
+		pass
 
 # gets an open seat in the car, if there is any
 # returns -1 for full car
 func get_open_seat() -> int:
-	if riders[0] == null:
-		return 0
-	
+	for i in riders.size():
+		if riders[i] == null:
+			return i
 	return -1
 
 # lets a player enter the car at the specified seat number
@@ -94,12 +108,8 @@ func enter(player: CharacterBody3D, seat: int) -> bool:
 	if riders[seat] == null:
 		return false
 	
-	# NOTE seat locking should be on car or player side?
-	
-	# TODO implement passenger code here
-	# return false for unable to enter/already full
-	
-	return false
+	riders[seat] = player
+	return true
 
 # drops the player at specified seat
 func exit(seat: int) -> bool:
@@ -113,10 +123,13 @@ func exit(seat: int) -> bool:
 
 # gets the marker of the specified seat
 func get_seat(seat: int) -> Marker3D:
-	return seats[seat]
+	return seat_mkrs[seat]
 # gets the marker of the first person camera
 func get_fcam(seat: int) -> Marker3D:
-	return fcams[seat]
+	return fcam_mkrs[seat]
 # gets the marker of the third person camera
 func get_tcam(seat: int) -> Marker3D:
-	return tcams[seat]
+	return tcam_mkrs[seat]
+# gets the marker of the exit location
+func get_exit(seat: int) -> Marker3D:
+	return exit_mkrs[seat]
