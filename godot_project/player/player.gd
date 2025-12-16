@@ -19,12 +19,21 @@ extends CharacterBody3D
 @export var enable_run: bool = true
 
 var first_person: bool = false
-var v_driving: bool = false
-var v_driven: Node3D = null
-var v_seat_loc: Marker3D = null
-var v_fcamera_loc: Marker3D = null # first person cam
-var v_tcamera_loc: Marker3D = null # third person cam
-# var paused = Global.paused
+
+# interacting stuff
+var i_node: Node = null
+var i_type # TODO
+var i_distance # TODO
+var i_message: String = ""
+
+# drivng stuff
+var v_driving: bool = false # if in driving mode
+var v_driven_car: Node3D = null # the driven vehicle
+var v_driven_seat: int = -1 # seat number
+var v_seat_mkr: Marker3D = null # seat marker
+var v_fcam_mkr: Marker3D = null # first person cam marker
+var v_tcam_mkr: Marker3D = null # third person cam marker
+var v_exit_mkr: Marker3D = null # exit location marker
 
 # nodes used
 @onready var first_person_cam = $first_person_cam
@@ -79,7 +88,7 @@ func _process(delta: float) -> void:
 	
 	if v_driving:
 		enable_third_person = false
-		first_person_cam.global_transform = v_fcamera_loc.global_transform
+		first_person_cam.global_transform = v_fcam_mkr.global_transform
 		first_person_cam.make_current()
 	
 	first_person = third_person_spring.spring_length < min_zoom and enable_first_person or not enable_third_person
@@ -89,12 +98,11 @@ func _process(delta: float) -> void:
 
 # movement code
 func _physics_process(delta):
-	
 	if Global.paused:
 		return
 	
 	if v_driving:
-		global_transform = v_seat_loc.global_transform
+		global_transform = v_seat_mkr.global_transform
 		return
 	
 	# more movement code or something
@@ -173,30 +181,31 @@ func switch_cam() -> void:
 			first_person_cam.rotation.z = third_person_spring.rotation.z
 			first_person_cam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-		
 
 # entering a vehicle
-# TODO make it work
-func enter_vehicle(car: Node3D) -> void:
-	var open_seat: int = car.get_open_seat()
-	if open_seat < 0:
-		# can't enter car because returned -1
+func enter_vehicle(car: RigidBody3D) -> void:
+	if v_driving:
 		return
 	
-	car.enter(self)
+	var seat_id: int = car.get_open_seat()
+	# can't enter car if returned -1
+	if seat_id < 0:
+		return
 	
+	# try entering
+	if not car.enter(self, seat_id):
+		return # if returned false, cannot enter
 	
 	v_driving = true
-	v_driven = car
-	v_seat_loc = car.get_seat()
-	v_fcamera_loc = car.get_fcamera()
-	v_tcamera_loc = car.get_tcamera()
+	v_driven_car = car
+	v_driven_seat = seat_id
+	
+	v_seat_mkr = car.get_seat(v_driven_seat)
+	v_fcam_mkr = car.get_fcam(v_driven_seat)
+	v_tcam_mkr = car.get_tcam(v_driven_seat)
+	v_exit_mkr = car.get_exit(v_driven_seat)
+	
 	# no more moving
-	velocity = Vector3(0,0,0)
-	
-	# hide mesh if needed
-	#player_mesh.visible = false
-	
-	
-	global_transform = v_seat_loc.global_transform
-	
+	velocity = Vector3.ZERO
+	global_transform = v_seat_mkr.global_transform
+	#player_mesh.visible = false # hide mesh
