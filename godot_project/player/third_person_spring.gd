@@ -1,6 +1,6 @@
 extends SpringArm3D
 
-@onready var player: CharacterBody3D = get_parent()
+@onready var player: CharacterBody3D = get_parent().get_parent()
 
 var first_person
 var sensitivity

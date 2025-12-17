@@ -36,22 +36,25 @@ var v_tcam_mkr: Marker3D = null # third person cam marker
 var v_exit_mkr: Marker3D = null # exit location marker
 
 # nodes used
-@onready var first_person_cam = $first_person_cam
-@onready var third_person_cam = $third_person_spring/third_person_cam
-@onready var third_person_spring = $third_person_spring
+@onready var fcam = $fcam_pivot/first_person_cam
+@onready var fcam_pivot = $fcam_pivot
+@onready var tcam = $tcam_pivot/third_person_spring/third_person_cam
+@onready var tcam_spring = $tcam_pivot/third_person_spring
+@onready var tcam_pivot = $tcam_pivot
 @onready var player_mesh = $mesh
+@onready var camera_origin = $cam_origin
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if enable_first_person:
-		third_person_spring.spring_length = 0
-		third_person_cam.current = false
-		first_person_cam.make_current()
+		tcam_spring.spring_length = 0
+		tcam.current = false
+		fcam.make_current()
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	else:
-		third_person_spring.spring_length = max_zoom / 2
-		first_person_cam.current = false
-		third_person_cam.make_current()
+		tcam_spring.spring_length = max_zoom / 2
+		fcam.current = false
+		tcam.make_current()
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	Global.paused = false
 
@@ -77,9 +80,9 @@ func _unhandled_input(event):
 	# first person camera movement
 	if event is InputEventMouseMotion and first_person:
 		rotation_degrees.y -= event.relative.x * sensitivity
-		first_person_cam.rotation_degrees.x -= event.relative.y * sensitivity
+		fcam.rotation_degrees.x -= event.relative.y * sensitivity
 		# limits for vertical rotation
-		first_person_cam.rotation_degrees.x = clamp(first_person_cam.rotation_degrees.x, -80, 80)
+		fcam.rotation_degrees.x = clamp(fcam.rotation_degrees.x, -80, 80)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -88,10 +91,10 @@ func _process(delta: float) -> void:
 	
 	if v_driving:
 		enable_third_person = false
-		first_person_cam.global_transform = v_fcam_mkr.global_transform
-		first_person_cam.make_current()
+		fcam.global_transform = v_fcam_mkr.global_transform
+		fcam.make_current()
 	
-	first_person = third_person_spring.spring_length < min_zoom and enable_first_person or not enable_third_person
+	first_person = tcam_spring.spring_length < min_zoom and enable_first_person or not enable_third_person
 	
 	if enable_first_person and enable_third_person:
 		switch_cam()
@@ -124,7 +127,7 @@ func _physics_process(delta):
 		direction.y = 0
 	else:
 		# gets the spring arm rotation
-		var cam_rotation = third_person_spring.global_transform.basis
+		var cam_rotation = tcam_spring.global_transform.basis
 		
 		# only need to do forward and right
 		var forward = cam_rotation.z
@@ -140,7 +143,7 @@ func _physics_process(delta):
 			var walking_direction = atan2(direction.x,direction.z) + PI
 			var new_direction = lerp_angle(player_mesh.global_rotation.y, walking_direction, player_turn_speed * delta)
 			player_mesh.global_rotation.y = new_direction
-			first_person_cam.global_rotation.y = new_direction
+			fcam.global_rotation.y = new_direction
 		
 	
 	# this line like prevents the player from moving faster when they are going diagonally
@@ -172,20 +175,20 @@ func switch_cam() -> void:
 	if first_person:
 		if Input.is_action_just_pressed("zoom_out"):
 			# set the spring length to the smallest allowed
-			third_person_spring.spring_length = min_zoom
-			third_person_spring.rotation = first_person_cam.rotation
-			third_person_cam.make_current()
+			tcam_spring.spring_length = min_zoom
+			tcam_spring.rotation = fcam.rotation
+			tcam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		elif get_viewport().get_camera_3d() == third_person_cam:
+		elif get_viewport().get_camera_3d() == tcam:
 			# set the rotation of the player to the rotation of the 3rd person cam
-			rotation.y = third_person_spring.global_transform.basis.get_euler().y
+			rotation.y = tcam_spring.global_transform.basis.get_euler().y
 			# reset the rotation of the mesh and first person cam, created by the 3rd person rotation code
-			first_person_cam.global_rotation.y = rotation.y
+			fcam.global_rotation.y = rotation.y
 			player_mesh.global_rotation.y = rotation.y
 			# match the rotation of the 3rd person cam
-			first_person_cam.rotation.x = third_person_spring.rotation.x
-			first_person_cam.rotation.z = third_person_spring.rotation.z
-			first_person_cam.make_current()
+			fcam.rotation.x = tcam_spring.rotation.x
+			fcam.rotation.z = tcam_spring.rotation.z
+			fcam.make_current()
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 # set the thing that player that can interact with
@@ -266,4 +269,6 @@ func exit_vehicle(car: RigidBody3D) -> void:
 	v_tcam_mkr = null
 	v_exit_mkr = null
 	
+	fcam_pivot.global_transform = camera_origin.global_transform
+	tcam_pivot.global_transform = camera_origin.global_transform
 	#player_mesh.visible = true # show mesh
