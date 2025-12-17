@@ -9,7 +9,9 @@ extends RigidBody3D
 @export var drivechain_efficiency: float = 0.85
 # the max traction allowed
 # so that the traction isn't infinite at 0 speed
-@export var max_tractive_force = 4500.0
+@export var max_tractive_force: float = 4500.0
+# the minimum speed that is calculated, prevents insanely large numbers
+@export var min_speed: float = 1.0
 # maximum force when braking
 @export var max_brake_force: float = 9000.0
 # natural engine brake force when the petal is lifted
@@ -53,6 +55,7 @@ var riders: Array[CharacterBody3D] = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	self.mass = car_mass
 	riders.resize(seat_mkrs.size())
 	enter_area.body_entered.connect(_body_entered)
 	enter_area.body_exited.connect(_body_exited)
@@ -65,24 +68,29 @@ func _physics_process(delta):
 	# driving input maps are: throttle, reverse, steer_left, steer_right, brake
 	# other include: interact
 	# these should all go from 0 to 1
-	var throttle_input = Input.get_action_strength("throttle")
-	var reverse_input = Input.get_action_strength("reverse")
-	var steer_input = Input.get_axis("steer_left", "steer_right")
-	var brake_input = Input.get_action_strength("brake")
+	var throttle_input := Input.get_action_strength("throttle")
+	var reverse_input := Input.get_action_strength("reverse")
+	var steer_input := Input.get_axis("steer_left", "steer_right")
+	var brake_input := Input.get_action_strength("brake")
 	
-	var current_velocity := linear_velocity
-	var current_speed := current_velocity.length()
-	var car_direction := -global_transform.basis.z
+	var v := linear_velocity
+	var s := v.length()
+	var forward := -global_transform.basis.z
+	var right := global_transform.basis.x
 	
-	# forward throttle
-	if throttle_input > deadzone:
-		pass
+	# the overall drive input
+	var drive_input := throttle_input - reverse_input
 	
-	# reverse throttle
+	# forward and reverse throttle
 	# reverse will simply apply a negative force to 'brake'
 	# instead of braking then reverse
-	if reverse_input > deadzone:
-		pass
+	var drive_force: float = 0.0
+	if abs(drive_input) > deadzone:
+		# using formula engine_force = (power * input) / velocity
+		var total_power = max_power_watts * drivechain_efficiency
+		drive_force = (total_power * drive_input) / max(min_speed, s)
+		print("calculated drive input: " + str(drive_input))
+		print("calculated drive force: " + str(drive_force))
 	
 	# steer
 	if abs(steer_input) > deadzone:
@@ -90,7 +98,11 @@ func _physics_process(delta):
 	
 	# brake
 	if brake_input > deadzone:
-		pass
+		var 
+		
+	
+	# apply all forces
+	apply_central_force(forward * drive_force)
 
 func _body_entered(body: Node) -> void:
 	if body is CharacterBody3D and body.has_method("set_interactable"):

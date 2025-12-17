@@ -1,6 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://c8rg4afao8hqe"]
+[gd_scene load_steps=7 format=3 uid="uid://c8rg4afao8hqe"]
 
 [ext_resource type="Script" uid="uid://c4o4i021y0hua" path="res://car/car.gd" id="1_2gitb"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_2gitb"]
+friction = 0.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_33qfd"]
 size = Vector3(2, 1, 5)
@@ -15,7 +18,23 @@ size = Vector3(2, 1.8, 5)
 size = Vector3(1, 1.8, 2)
 
 [node name="car" type="RigidBody3D"]
+physics_material_override = SubResource("PhysicsMaterial_2gitb")
 script = ExtResource("1_2gitb")
+max_power_watts = null
+drivechain_efficiency = null
+max_tractive_force = null
+min_speed = null
+max_brake_force = null
+engine_brake_force = null
+rolling_resistance_coef = null
+drag_coef = null
+car_mass = null
+lat_cof = null
+long_cof = null
+gravity = null
+steering_speed_00 = null
+steering_speed_30 = null
+deadzone = null
 
 [node name="mesh" type="Node3D" parent="."]
 

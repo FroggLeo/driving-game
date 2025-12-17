@@ -42,6 +42,7 @@ var v_exit_mkr: Marker3D = null # exit location marker
 @onready var tcam_spring = $tcam_pivot/third_person_spring
 @onready var tcam_pivot = $tcam_pivot
 @onready var player_mesh = $mesh
+@onready var player_collision = $CollisionShape3D
 @onready var camera_origin = $cam_origin
 
 # Called when the node enters the scene tree for the first time.
@@ -91,7 +92,7 @@ func _process(delta: float) -> void:
 	
 	if v_driving:
 		enable_third_person = false
-		fcam.global_transform = v_fcam_mkr.global_transform
+		fcam_pivot.global_position = v_fcam_mkr.global_position
 		fcam.make_current()
 	
 	first_person = tcam_spring.spring_length < min_zoom and enable_first_person or not enable_third_person
@@ -105,7 +106,7 @@ func _physics_process(delta):
 		return
 	
 	if v_driving:
-		global_transform = v_seat_mkr.global_transform
+		global_position = v_seat_mkr.global_position
 		if Input.is_action_just_pressed("interact"):
 			exit_vehicle(v_driven_car)
 		return
@@ -246,6 +247,7 @@ func enter_vehicle(car: RigidBody3D) -> void:
 	
 	# no more moving
 	velocity = Vector3.ZERO
+	player_collision.disabled = true
 	global_transform = v_seat_mkr.global_transform
 	#player_mesh.visible = false # hide mesh
 
@@ -258,7 +260,7 @@ func exit_vehicle(car: RigidBody3D) -> void:
 	if not car.exit(v_driven_seat):
 		return # if returned false, cannot exit
 	
-	global_transform = v_exit_mkr.global_transform
+	global_position = v_exit_mkr.global_position
 	
 	v_driving = false
 	v_driven_car = null
@@ -269,6 +271,7 @@ func exit_vehicle(car: RigidBody3D) -> void:
 	v_tcam_mkr = null
 	v_exit_mkr = null
 	
+	player_collision.disabled = false
 	fcam_pivot.global_transform = camera_origin.global_transform
 	tcam_pivot.global_transform = camera_origin.global_transform
 	#player_mesh.visible = true # show mesh

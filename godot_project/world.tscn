@@ -8,7 +8,7 @@
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_gv5m4"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_f3sb7"]
-size = Vector3(10, 1, 10)
+size = Vector3(100, 1, 100)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f3sb7"]
 albedo_texture = ExtResource("1_fj7yv")
@@ -16,7 +16,7 @@ uv1_triplanar = true
 uv2_triplanar = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fj7yv"]
-size = Vector3(10, 1, 10)
+size = Vector3(100, 1, 100)
 
 [node name="World" type="Node3D"]
 
