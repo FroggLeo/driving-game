@@ -20,21 +20,6 @@ size = Vector3(1, 1.8, 2)
 [node name="car" type="RigidBody3D"]
 physics_material_override = SubResource("PhysicsMaterial_2gitb")
 script = ExtResource("1_2gitb")
-max_power_watts = null
-drivechain_efficiency = null
-max_tractive_force = null
-min_speed = null
-max_brake_force = null
-engine_brake_force = null
-rolling_resistance_coef = null
-drag_coef = null
-car_mass = null
-lat_cof = null
-long_cof = null
-gravity = null
-steering_speed_00 = null
-steering_speed_30 = null
-deadzone = null
 
 [node name="mesh" type="Node3D" parent="."]
 
@@ -65,7 +50,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.3999999, -1)
 
 [node name="exit_0" type="Marker3D" parent="markers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, -1)
 
 [node name="seat_0" type="Marker3D" parent="markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)
