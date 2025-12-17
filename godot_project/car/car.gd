@@ -55,11 +55,12 @@ var riders: Array[CharacterBody3D] = []
 func _ready():
 	riders.resize(seat_mkrs.size())
 	enter_area.body_entered.connect(_body_entered)
-	enter_area.body_entered.connect(_body_exited)
+	enter_area.body_exited.connect(_body_exited)
 
 # movement code
 func _physics_process(delta):
-	
+	if riders.size() == 0 or riders[0] == null:
+		return
 	# NOTE
 	# driving input maps are: throttle, reverse, steer_left, steer_right, brake
 	# other include: interact

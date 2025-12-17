@@ -103,6 +103,12 @@ func _physics_process(delta):
 	
 	if v_driving:
 		global_transform = v_seat_mkr.global_transform
+		if Input.is_action_just_pressed("interact"):
+			exit_vehicle(v_driven_car)
+		return
+	
+	if i_type == "car" and Input.is_action_just_pressed("interact"):
+		enter_vehicle(i_object)
 		return
 	
 	# more movement code or something
@@ -185,12 +191,14 @@ func switch_cam() -> void:
 # set the thing that player that can interact with
 func set_interactable(object: Node, origin: Marker3D, type: String, message: String) -> void:
 	if i_object == object:
+		print("skipped setting object! type: " + i_type)
 		return
-	if object == null:
+	if i_object == null:
 		i_object = object
 		i_origin = origin
 		i_type = type
 		i_message = message
+		print("successfully set object! type: " + type)
 		return
 	# pick the closest interactable
 	var original_distance := global_transform.origin.distance_to(i_origin.global_transform.origin)
@@ -200,6 +208,7 @@ func set_interactable(object: Node, origin: Marker3D, type: String, message: Str
 		i_origin = origin
 		i_type = type
 		i_message = message
+		print("successfully set new object! type: " + i_type)
 
 func clear_interactable(object: Node) -> void:
 	if i_object == object:
@@ -207,6 +216,7 @@ func clear_interactable(object: Node) -> void:
 		i_origin = null
 		i_type = ""
 		i_message = ""
+		print("successfully cleared object!")
 
 # entering a vehicle
 func enter_vehicle(car: RigidBody3D) -> void:
