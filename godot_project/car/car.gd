@@ -24,6 +24,7 @@ extends RigidBody3D
 @export var rolling_resistance_coef: float = 0.012
 # aerodynamic drag constant
 @export var drag_coef: float = 0.55
+@export var drag_area: float = 4.0
 @export var air_density: float = 1.225
 
 # mass of the truck in kg
@@ -67,25 +68,21 @@ func _physics_process(delta):
 	# driving input maps are: throttle, reverse, steer_left, steer_right, brake
 	# other include: interact
 	# these should all go from 0 to 1
+	# HACK need to move controls to player side
 	var throttle_input := Input.get_action_strength("throttle")
 	var reverse_input := Input.get_action_strength("reverse")
-	var steer_input := Input.get_axis("steer_left", "steer_right")
 	var brake_input := Input.get_action_strength("brake")
+	var drive_input := throttle_input - reverse_input # the overall throttle or reverse input
+	var steer_input := Input.get_axis("steer_left", "steer_right")
 	
 	var v := linear_velocity
 	var s := v.length()
-	var forward := -global_transform.basis.z
-	var right := global_transform.basis.x
-	# speed along the forward direction, -1 to 1
-	var v_forward := v.dot(forward)
+	var forward := (-global_transform.basis.z).normalized()
+	var v_forward := v.dot(forward) # speed along the forward direction, -1 to 1
+	var right := global_transform.basis.x.normalized()
+	var v_right := v.dot(right)
 	
-	# the overall drive input
-	var drive_input := throttle_input - reverse_input
-	
-	# steer
-	if abs(steer_input) > deadzone and abs(v_forward) > 0.1:
-		pass
-		
+	# THROTTLE STUFF
 	
 	# forward and reverse throttle
 	# reverse will simply apply a negative force to 'brake'
@@ -106,13 +103,13 @@ func _physics_process(delta):
 	# coasting force, no pedals down
 	var engine_force: float = 0.0
 	if abs(drive_input) <= deadzone and abs(v_forward) > 0.01:
-		engine_force = -engine_brake_force_max * s / (s + engine_brake_fade_speed)
+		engine_force = -engine_brake_force_max * s / (s + engine_brake_fade_speed) * sign(v_forward)
 	
 	# rolling resistance and aerodynamic drag
 	var resist_force: float = 0.0
 	if s > 0.01:
 		# drag calculation based on the formula
-		var drag_force = air_density * s * s * 4 * drag_coef / 2
+		var drag_force = air_density * s * s * drag_area * drag_coef / 2
 		var roll_force = rolling_resistance_coef * total_mass * gravity
 		# -sign(v_forward) allows us to apply the force in the opposite direction of the movement
 		resist_force = (drag_force + roll_force) * -sign(v_forward)

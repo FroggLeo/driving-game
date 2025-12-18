@@ -57,3 +57,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0, -1)
 
 [node name="seat_0" type="Marker3D" parent="markers"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)
+
+[node name="wheels" type="Node3D" parent="."]
+
+[node name="fl" type="RayCast3D" parent="wheels"]
+
+[node name="fr" type="RayCast3D" parent="wheels"]
+
+[node name="rl" type="RayCast3D" parent="wheels"]
+
+[node name="rr" type="RayCast3D" parent="wheels"]
