@@ -52,15 +52,10 @@ var v_exit_mkr: Marker3D = null # exit location marker
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if enable_first_person:
-		tcam_spring.spring_length = 0
-		tcam.current = false
-		fcam.make_current()
-		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		set_fcam()
 	else:
-		tcam_spring.spring_length = max_zoom / 2
-		fcam.current = false
-		tcam.make_current()
-		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		set_tcam(Vector3.ZERO, max_zoom / 2)
+	
 	Global.paused = false
 
 func _unhandled_input(event):
@@ -68,7 +63,8 @@ func _unhandled_input(event):
 	# should make this work with multiplayer, reduce global file as much as possible
 	if Input.is_action_just_pressed("ui_cancel"):
 		if Global.paused:
-			if first_person:
+			# unpause
+			if cam_mode == CamMode.FIRST:
 				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 			else:
 				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -83,7 +79,7 @@ func _unhandled_input(event):
 		return
 	
 	# first person camera movement
-	if event is InputEventMouseMotion and first_person:
+	if event is InputEventMouseMotion and cam_mode == CamMode.FIRST:
 		fcam.rotation_degrees.y -= event.relative.x * sensitivity
 		fcam.rotation_degrees.x -= event.relative.y * sensitivity
 		# limits for vertical rotation
@@ -98,10 +94,8 @@ func _process(delta: float) -> void:
 		fcam_pivot.global_transform = v_fcam_mkr.global_transform
 		tcam_pivot.global_transform = v_tcam_mkr.global_transform
 	
-	first_person = tcam_spring.spring_length < min_zoom and enable_first_person or not enable_third_person
-	
-	if enable_first_person and enable_third_person:
-		switch_cam()
+	if Input.is_action_just_pressed("zoom_out") and cam_mode == CamMode.FIRST:
+		switch_ftcam()
 
 # movement code
 func _physics_process(delta):
@@ -125,22 +119,13 @@ func _physics_process(delta):
 	var input_direction_3D := Vector3(input_direction_2D.x, 0.0, input_direction_2D.y)
 	
 	# calculate direction 
-	if first_person:
+	if cam_mode == CamMode.FIRST:
 		# gets the player rotation
-		direction = transform.basis * input_direction_3D
+		direction = fcam.global_transform.basis * input_direction_3D
 		direction.y = 0
 	else:
-		# gets the spring arm rotation
-		var cam_rotation = tcam_spring.global_transform.basis
-		
-		# only need to do forward and right
-		var forward = cam_rotation.z
-		var right = cam_rotation.x
-		# keeps the speed the same despite the up down rotation of the camera
-		forward.y = 0
-		right.y = 0
-		
-		direction = (right * input_direction_2D.x) + (forward * input_direction_2D.y)
+		direction = tcam_spring.global_transform.basis * input_direction_3D
+		direction.y = 0
 		
 		# 3rd person rotation code
 		if direction.length() > 0.001:
@@ -150,7 +135,7 @@ func _physics_process(delta):
 			fcam.global_rotation.y = new_direction
 		
 	
-	# this line like prevents the player from moving faster when they are going diagonally
+	# normalize to 0..1 for diagonal directions
 	direction = direction.normalized()
 	
 	if Input.is_action_pressed("crouch") and enable_crouch:
@@ -191,58 +176,20 @@ func switch_ftcam(sync_rotation: bool = true):
 			# set to 1st person
 			set_fcam()
 
-func set_fcam(rotation: Vector3 = fcam.global_rotation):
+# set to first person camera
+func set_fcam(rot: Vector3 = fcam.global_rotation):
 	cam_mode = CamMode.FIRST
-	fcam.global_rotation = rotation
+	fcam.global_rotation = rot
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	fcam.make_current()
 
-func set_tcam(rotation: Vector3 = tcam_spring.global_rotation, length: float = min_zoom):
+# set to third person camera
+func set_tcam(rot: Vector3 = tcam_spring.global_rotation, length: float = min_zoom):
 	cam_mode = CamMode.THIRD
-	tcam_spring.global_rotation = rotation
+	tcam_spring.global_rotation = rot
 	tcam_spring.spring_length = length
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	tcam.make_current()
-
-func set_cam(cam1: Camera3D, cam2: Camera3D, cam1_r: Node3D == null, cam2_r: Node3D == null, sync_rotation: bool = true, spring_length: float = min_zoom) -> void:
-	
-	if sync_rotation:
-		new_cam.global_rotation = old_cam.global_rotation
-	
-	
-
-func sync_cam_rotation(cam1: Camera3D, cam2: Camera3D, cam1_r: Node3D == null, cam2_r: Node3D == null) -> void:
-	# match the rotation
-	if cam1_r == cam2_r: # if both are null
-		cam2.global_rotation = cam1.global_rotation
-	elif cam1_r != null:
-		cam2.global_rotation = cam1_r.global_rotation
-	elif cam2_r != null:
-		cam2_r.global_rotation = cam1.global_rotation
-	else: # if both rotations/pivots are provided
-		cam2_r.global_rotation = cam1_r.global_rotation
-
-# auto switch camera
-# TODO need to refactor
-func switch_cam() -> void:
-	if first_person:
-		if Input.is_action_just_pressed("zoom_out"):
-			# set the spring length to the smallest allowed
-			tcam_spring.spring_length = min_zoom
-			tcam_spring.rotation = fcam.rotation
-			tcam.make_current()
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		elif get_viewport().get_camera_3d() == tcam:
-			# set the rotation of the player to the rotation of the 3rd person cam
-			rotation.y = tcam_spring.global_transform.basis.get_euler().y
-			# reset the rotation of the mesh and first person cam, created by the 3rd person rotation code
-			fcam.global_rotation.y = rotation.y
-			player_mesh.global_rotation.y = rotation.y
-			# match the rotation of the 3rd person cam
-			fcam.rotation.x = tcam_spring.rotation.x
-			fcam.rotation.z = tcam_spring.rotation.z
-			fcam.make_current()
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 # set the thing that player that can interact with
 func set_interactable(object: Node, origin: Marker3D, type: String, message: String) -> void:
