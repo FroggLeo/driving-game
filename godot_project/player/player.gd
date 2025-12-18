@@ -18,7 +18,9 @@ extends CharacterBody3D
 @export var enable_crouch: bool = true
 @export var enable_run: bool = true
 
-var first_person: bool = false
+# can add more cam modes if needed
+enum CamMode {FIRST, THIRD}
+var cam_mode: CamMode = CamMode.FIRST
 
 # interacting stuff
 var i_object: Node = null
@@ -38,9 +40,11 @@ var v_exit_mkr: Marker3D = null # exit location marker
 # nodes used
 @onready var fcam = $fcam_pivot/first_person_cam
 @onready var fcam_pivot = $fcam_pivot
+
 @onready var tcam = $tcam_pivot/third_person_spring/third_person_cam
 @onready var tcam_spring = $tcam_pivot/third_person_spring
 @onready var tcam_pivot = $tcam_pivot
+
 @onready var player_mesh = $mesh
 @onready var player_collision = $CollisionShape3D
 @onready var camera_origin = $cam_origin
@@ -80,7 +84,7 @@ func _unhandled_input(event):
 	
 	# first person camera movement
 	if event is InputEventMouseMotion and first_person:
-		rotation_degrees.y -= event.relative.x * sensitivity
+		fcam.rotation_degrees.y -= event.relative.x * sensitivity
 		fcam.rotation_degrees.x -= event.relative.y * sensitivity
 		# limits for vertical rotation
 		fcam.rotation_degrees.x = clamp(fcam.rotation_degrees.x, -80, 80)
@@ -91,9 +95,8 @@ func _process(delta: float) -> void:
 		return
 	
 	if v_driving:
-		enable_third_person = false
-		fcam_pivot.global_position = v_fcam_mkr.global_position
-		fcam.make_current()
+		fcam_pivot.global_transform = v_fcam_mkr.global_transform
+		tcam_pivot.global_transform = v_tcam_mkr.global_transform
 	
 	first_person = tcam_spring.spring_length < min_zoom and enable_first_person or not enable_third_person
 	
@@ -171,7 +174,56 @@ func _physics_process(delta):
 	
 	move_and_slide()
 
+func switch_ftcam(sync_rotation: bool = true):
+	# call set_cam() to set the manually
+	if sync_rotation:
+		if cam_mode == CamMode.FIRST:
+			# set to 3rd person
+			set_tcam(fcam.global_rotation)
+		else: 
+			# set to 1st person
+			set_fcam(tcam.global_rotation)
+	else:
+		if cam_mode == CamMode.FIRST:
+			# set to 3rd person
+			set_tcam()
+		else: 
+			# set to 1st person
+			set_fcam()
+
+func set_fcam(rotation: Vector3 = fcam.global_rotation):
+	cam_mode = CamMode.FIRST
+	fcam.global_rotation = rotation
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	fcam.make_current()
+
+func set_tcam(rotation: Vector3 = tcam_spring.global_rotation, length: float = min_zoom):
+	cam_mode = CamMode.THIRD
+	tcam_spring.global_rotation = rotation
+	tcam_spring.spring_length = length
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	tcam.make_current()
+
+func set_cam(cam1: Camera3D, cam2: Camera3D, cam1_r: Node3D == null, cam2_r: Node3D == null, sync_rotation: bool = true, spring_length: float = min_zoom) -> void:
+	
+	if sync_rotation:
+		new_cam.global_rotation = old_cam.global_rotation
+	
+	
+
+func sync_cam_rotation(cam1: Camera3D, cam2: Camera3D, cam1_r: Node3D == null, cam2_r: Node3D == null) -> void:
+	# match the rotation
+	if cam1_r == cam2_r: # if both are null
+		cam2.global_rotation = cam1.global_rotation
+	elif cam1_r != null:
+		cam2.global_rotation = cam1_r.global_rotation
+	elif cam2_r != null:
+		cam2_r.global_rotation = cam1.global_rotation
+	else: # if both rotations/pivots are provided
+		cam2_r.global_rotation = cam1_r.global_rotation
+
 # auto switch camera
+# TODO need to refactor
 func switch_cam() -> void:
 	if first_person:
 		if Input.is_action_just_pressed("zoom_out"):
