@@ -22,21 +22,6 @@ material = SubResource("StandardMaterial3D_qjkh3")
 
 [node name="player" type="CharacterBody3D"]
 script = ExtResource("1_4flbx")
-walk_speed = null
-crouch_speed = null
-run_speed = null
-gravity = null
-jump_velocity = null
-player_turn_speed = null
-max_zoom = null
-min_zoom = null
-zoom_increment = null
-sensitivity = null
-enable_jumping = null
-enable_first_person = null
-enable_third_person = null
-enable_crouch = null
-enable_run = null
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -61,7 +46,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
 [node name="first_person_cam" type="Camera3D" parent="fcam_pivot"]
-unique_name_in_owner = true
 
 [node name="tcam_pivot" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)

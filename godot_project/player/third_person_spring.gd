@@ -2,16 +2,19 @@ extends SpringArm3D
 
 @onready var player: CharacterBody3D = get_parent().get_parent()
 
-var first_person
-var sensitivity
-var zoom_increment
-var max_zoom
-var min_zoom
+enum CamMode {FIRST, THIRD}
+var cam_mode
+var enabled: bool
+var sensitivity: float
+var zoom_increment: float
+var max_zoom: float
+var min_zoom: float
 var last_mouse_pos: Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# move to _process if need to dynamically update
+	enabled = player.enable_third_person
 	zoom_increment = player.zoom_increment
 	max_zoom = player.max_zoom
 	min_zoom = player.min_zoom
@@ -19,13 +22,16 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if Global.paused:
+	if Global.paused or not enabled:
 		return
 	
-	first_person = player.first_person
+	cam_mode = player.cam_mode
 	
-	if first_person or not player.enable_third_person:
+	if cam_mode != CamMode.THIRD:
 		return
+	
+	if spring_length < min_zoom:
+		player.switch_ftcam()
 	
 	# zoom in and out
 	# TODO smooth zoom movement
@@ -45,9 +51,9 @@ func _process(delta: float) -> void:
 	
 
 func _unhandled_input(event: InputEvent) -> void:
-	if Global.paused:
+	if Global.paused or not enabled:
 		return
-	if first_person or not player.enable_third_person:
+	if cam_mode != CamMode.THIRD:
 		return
 	
 	# 3rd person camera rotation code
