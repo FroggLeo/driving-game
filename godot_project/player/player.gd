@@ -84,6 +84,8 @@ func _unhandled_input(event):
 		fcam.rotation_degrees.x -= event.relative.y * sensitivity
 		# limits for vertical rotation
 		fcam.rotation_degrees.x = clamp(fcam.rotation_degrees.x, -80, 80)
+		# match up mesh rotation
+		player_mesh.global_rotation.y = fcam.global_rotation.y
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -180,6 +182,7 @@ func switch_ftcam(sync_rotation: bool = true):
 func set_fcam(rot: Vector3 = fcam.global_rotation):
 	cam_mode = CamMode.FIRST
 	fcam.global_rotation = rot
+	player_mesh.global_rotation.y = rot.y
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	fcam.make_current()
 
