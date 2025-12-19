@@ -61,9 +61,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)
 [node name="wheels" type="Node3D" parent="."]
 
 [node name="fl" type="RayCast3D" parent="wheels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.4901161e-08, -1.5)
 
 [node name="fr" type="RayCast3D" parent="wheels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 1.4901161e-08, -1.5)
 
 [node name="rl" type="RayCast3D" parent="wheels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.4901161e-08, 1.5)
 
 [node name="rr" type="RayCast3D" parent="wheels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.4901161e-08, 1.5)
