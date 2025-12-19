@@ -41,12 +41,12 @@ extends RigidBody3D
 
 ## radius of the wheel in meters
 @export var wheel_radius: float = 0.33
-@export var suspension_rest: float = 0.35
-## spring constant, in newtons/meter
-@export var suspension_k: float = 100000.0
+@export var suspension_rest: float = 0.75
+## spring constant per wheel, in newtons/meter
+@export var suspension_k: float = 30000.0
 ## damping of the suspension, shock absorbers
 ## in newton-seconds / meter
-@export var suspension_b: float = 5000.0
+@export var suspension_b: float = 3000.0
 ## maximum steer angle of the car
 @export var steer_angle_max_deg: float = 30.0
 
@@ -76,6 +76,12 @@ var total_mass := car_mass # add item masses here too
 func _ready():
 	self.mass = car_mass
 	riders.resize(seat_mkrs.size())
+	var raycast_length := -(wheel_radius + suspension_rest + 0.1)
+	print("raycast length: ", raycast_length)
+	w_fl.target_position = Vector3(0, -(wheel_radius + suspension_rest + 0.1), 0)
+	w_fr.target_position = Vector3(0, -(wheel_radius + suspension_rest + 0.1), 0)
+	w_rl.target_position = Vector3(0, -(wheel_radius + suspension_rest + 0.1), 0)
+	w_rr.target_position = Vector3(0, -(wheel_radius + suspension_rest + 0.1), 0)
 	enter_area.body_entered.connect(_body_entered)
 	enter_area.body_exited.connect(_body_exited)
 
@@ -111,9 +117,12 @@ func _physics_process(delta):
 	w_rr.force_raycast_update()
 
 	# TEMP: prove contact
-	if Engine.get_physics_frames() % 10 == 0:
-		print("FL:", w_fl.is_colliding(), " FR:", w_fr.is_colliding(),
-			  " RL:", w_rl.is_colliding(), " RR:", w_rr.is_colliding())
+	#if Engine.get_physics_frames() % 10 == 0:
+	#	print("FL:", w_fl.is_colliding(), " FR:", w_fr.is_colliding(),
+	#		  " RL:", w_rl.is_colliding(), " RR:", w_rr.is_colliding())
+	if w_fl.is_colliding():
+		var dist = w_fl.global_transform.origin.distance_to(w_fl.get_collision_point())
+		print("FL dist:", dist)
 	
 	# THROTTLE STUFF
 	
@@ -135,7 +144,7 @@ func _physics_process(delta):
 	
 	# coasting force, no pedals down
 	var engine_force: float = 0.0
-	if abs(drive_input) <= deadzone and abs(v_forward) > 0.01 and riders[0] != null:
+	if (abs(drive_input) <= deadzone or riders[0] != null) and abs(v_forward) > 0.01:
 		engine_force = -engine_brake_force_max * s / (s + engine_brake_fade_speed) * sign(v_forward)
 	
 	# rolling resistance and aerodynamic drag
@@ -179,7 +188,7 @@ func _apply_suspension(wheel: RayCast3D, delta: float) -> float:
 	
 	# how much the spring is compressed
 	var x := suspension_rest - dist
-	
+	x = max(0.0, x)
 	# the vector from the center of mass to the point of contact
 	# or also the distance from reference point to target point
 	var radius := point - global_transform.origin

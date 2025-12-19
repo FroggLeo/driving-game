@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://c8rg4afao8hqe"]
+[gd_scene load_steps=9 format=3 uid="uid://c8rg4afao8hqe"]
 
 [ext_resource type="Script" uid="uid://c4o4i021y0hua" path="res://car/car.gd" id="1_2gitb"]
 
@@ -16,6 +16,13 @@ size = Vector3(2, 1.8, 5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_2gitb"]
 size = Vector3(1, 1.8, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2gitb"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dxy33"]
+material = SubResource("StandardMaterial3D_2gitb")
+height = 0.22
 
 [node name="car" type="RigidBody3D"]
 physics_material_override = SubResource("PhysicsMaterial_2gitb")
@@ -61,13 +68,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)
 [node name="wheels" type="Node3D" parent="."]
 
 [node name="fl" type="RayCast3D" parent="wheels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.4901161e-08, -1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9, 0.1, -1.8)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="wheels/fl"]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_dxy33")
 
 [node name="fr" type="RayCast3D" parent="wheels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1, 1.4901161e-08, -1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.1, -1.8)
 
 [node name="rl" type="RayCast3D" parent="wheels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.4901161e-08, 1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0.1, 1.5)
 
 [node name="rr" type="RayCast3D" parent="wheels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.4901161e-08, 1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.1, 1.5)
