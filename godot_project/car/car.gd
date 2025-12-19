@@ -44,7 +44,7 @@ extends RigidBody3D
 ## the length of the suspension
 @export var suspension_length: float = 0.35
 ## spring constant per wheel, in newtons/meter
-@export var suspension_k: float = 30000.0
+@export var suspension_k: float = 25000.0
 ## damping of the suspension, shock absorbers
 ## in newton-seconds / meter
 @export var suspension_b: float = 3000.0
@@ -77,6 +77,11 @@ extends RigidBody3D
 @onready var w_fr: RayCast3D = $wheels/fr
 @onready var w_rl: RayCast3D = $wheels/rl
 @onready var w_rr: RayCast3D = $wheels/rr
+
+@onready var w_fl_m: MeshInstance3D = $wheels/fl/mesh_fl
+@onready var w_fr_m: MeshInstance3D = $wheels/fr/mesh_fr
+@onready var w_rl_m: MeshInstance3D = $wheels/rl/mesh_rl
+@onready var w_rr_m: MeshInstance3D = $wheels/rr/mesh_rr
 
 var riders: Array[CharacterBody3D] = []
 var total_mass := car_mass # add item masses here too
@@ -159,10 +164,10 @@ func _physics_process(delta):
 	var total_long_force = drive_force + brake_force + engine_force + resist_force
 	# apply the force
 	apply_central_force(forward * total_long_force)
-	_apply_suspension(w_fl, delta)
-	_apply_suspension(w_fr, delta)
-	_apply_suspension(w_rl, delta)
-	_apply_suspension(w_rr, delta)
+	_apply_suspension(w_fl, w_fl_m, delta)
+	_apply_suspension(w_fr, w_fr_m, delta)
+	_apply_suspension(w_rl, w_rl_m, delta)
+	_apply_suspension(w_rr, w_rr_m, delta)
 
 # when a body enters the enter area
 # underscore is for internal function
@@ -175,9 +180,10 @@ func _body_exited(body: Node) -> void:
 	if body is CharacterBody3D and body.has_method("set_interactable"):
 		body.clear_interactable(self)
 
-func _apply_suspension(wheel: RayCast3D, delta: float) -> float:
+func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, delta: float) -> float:
 	if not wheel.is_colliding():
 		# no force applied
+		mesh.position.y = -suspension_length + wheel_radius
 		return 0.0
 	
 	var point := wheel.get_collision_point() # where the point of contact is
@@ -187,6 +193,8 @@ func _apply_suspension(wheel: RayCast3D, delta: float) -> float:
 	
 	# the current spring length should be the total distance - wheel radius
 	var spring_length := dist - wheel_radius
+	
+	mesh.position.y = -spring_length + wheel_radius
 	
 	# how much the spring is compressed
 	var x := suspension_length - spring_length
