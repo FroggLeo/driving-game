@@ -105,7 +105,7 @@ func _physics_process(delta):
 		return
 	
 	if v_driving:
-		global_position = v_seat_mkr.global_position
+		global_transform = v_seat_mkr.global_transform
 		if Input.is_action_just_pressed("interact"):
 			exit_vehicle(v_driven_car)
 		return
