@@ -27,6 +27,29 @@ height = 0.22
 [node name="car" type="RigidBody3D"]
 physics_material_override = SubResource("PhysicsMaterial_2gitb")
 script = ExtResource("1_2gitb")
+max_power_watts = null
+drivechain_efficiency = null
+max_tractive_force = null
+min_speed = null
+max_brake_force = null
+engine_brake_force_max = null
+engine_brake_fade_speed = null
+rolling_resistance_coef = null
+drag_coef = null
+drag_area = null
+air_density = null
+car_mass = null
+lat_cof = null
+long_cof = null
+gravity = null
+wheel_radius = null
+suspension_length = null
+suspension_k = null
+suspension_bump_k = null
+suspension_bump_start = null
+suspension_b = null
+steer_angle_max_deg = null
+deadzone = null
 
 [node name="mesh" type="Node3D" parent="."]
 

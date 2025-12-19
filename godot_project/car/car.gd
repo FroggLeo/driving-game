@@ -40,7 +40,7 @@ extends RigidBody3D
 @export var gravity: float = 9.81
 
 ## radius of the wheel in meters
-@export var wheel_radius: float = 0.33
+@export var wheel_radius: float = 0.25
 ## the length of the suspension
 @export var suspension_length: float = 0.35
 ## spring constant per wheel, in newtons/meter
@@ -48,6 +48,14 @@ extends RigidBody3D
 ## damping of the suspension, shock absorbers
 ## in newton-seconds / meter
 @export var suspension_b: float = 3000.0
+
+## when should the force of the bump be applied?
+## percentage of the suspension length, 0..1
+## example: 0.8, bump force starts in the last 20% compression
+@export var suspension_bump_start: float = 0.8
+## spring constant of the bump stop
+@export var suspension_bump_k: float = 300000.0
+
 ## maximum steer angle of the car
 @export var steer_angle_max_deg: float = 30.0
 
@@ -177,12 +185,13 @@ func _apply_suspension(wheel: RayCast3D, delta: float) -> float:
 	var pos := wheel.global_transform.origin # position of the wheel hub
 	var dist := pos.distance_to(point) # distance from the hub to the ground
 	
-	# the spring length should be the total distance - wheel radius
+	# the current spring length should be the total distance - wheel radius
 	var spring_length := dist - wheel_radius
 	
 	# how much the spring is compressed
 	var x := suspension_length - spring_length
-	x = max(0.0, x)
+	x = max(x, 0.0)
+	
 	# the vector from the center of mass to the point of contact
 	# or also the distance from reference point to target point
 	var radius := point - global_transform.origin
@@ -197,7 +206,15 @@ func _apply_suspension(wheel: RayCast3D, delta: float) -> float:
 	# damping force formula, force = damping_coefficient * velocity
 	var damper_force := suspension_b * -velocity_normal
 	
-	var total_force : float = max(0.0, spring_force + damper_force)
+	# the bump / really stiff spring
+	var bump_force := 0.0
+	var bump_start := suspension_length * suspension_bump_start
+	if x > bump_start:
+		var bump_x := x - bump_start
+		#var bump_percent := bump_x / (suspension_length - bump_start)
+		bump_force = suspension_bump_k * bump_x * bump_x
+	
+	var total_force : float = max(0.0, spring_force + damper_force + bump_force)
 	
 	# applies the force at normal direction, with the total force
 	# at the distance away from center of gravity (radius)
