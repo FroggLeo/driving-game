@@ -4,28 +4,29 @@ extends RigidBody3D
 # NOT kei truck!!! legal in america!!!
 
 ## using watts to be realistic and have a dynamic top speed
-@export var max_power_watts: float = 35000.0
+@export var max_power_watts: float = 135000.0
 ## efficiency loss from the engine to the wheels
-@export var drivechain_efficiency: float = 0.85
+@export var drivechain_efficiency: float = 0.88
 ## the max traction allowed
 ## so that the traction isn't infinite at 0 speed
-@export var max_tractive_force: float = 4500.0
+@export var max_tractive_force: float = 12000.0
 ## the minimum speed that is calculated, prevents insanely large numbers
 @export var min_speed: float = 1.0
 ## maximum force when braking
-@export var max_brake_force: float = 9000.0
+@export var max_brake_force: float = 17000.0
 
 ## natural engine brake force when the petal is lifted
 ## simple modeling using this function:
 ## force = -brake_force_max * v / (v + brake_fade_speed)
-@export var engine_brake_force_max: float = 1000.0
+@export var engine_brake_force_max: float = 1600.0
+## how much the engine braking fades out
 @export var engine_brake_fade_speed: float = 25.0
 ## force of the roll is the mass * coef * gravity
 @export var rolling_resistance_coef: float = 0.012
 ## aerodynamic drag constant
-@export var drag_coef: float = 0.55
+@export var drag_coef: float = 0.42
 ## drag area, part of the drag formula
-@export var drag_area: float = 4.0
+@export var drag_area: float = 2.9
 ## density of the air to calculate drag
 @export var air_density: float = 1.225
 
@@ -33,28 +34,32 @@ extends RigidBody3D
 @export var car_mass: float = 1700.0
 ## coefficient of friction of the wheels
 ## friction force laterally, front and back
-@export var lat_cof: float = 0.75
+@export var tire_lat_cof: float = 0.80
 ## friction force left and right
-@export var long_cof: float = 0.85
+@export var tire_long_cof: float = 0.90
+## stiffness of the tire
+@export var tire_stiffness: float = 40.0
 ## gravity
 @export var gravity: float = 9.81
 
 ## radius of the wheel in meters
-@export var wheel_radius: float = 0.25
+@export var wheel_radius: float = 0.33
 ## the length of the suspension
-@export var suspension_length: float = 0.35
-## spring constant per wheel, in newtons/meter
-@export var suspension_k: float = 25000.0
+@export var suspension_length: float = 0.30
+## spring constant per front wheel, in newtons/meter
+@export var suspension_fk: float = 40000.0
+## spring constant per rear wheel, in newtons/meter
+@export var suspension_rk: float = 37000.0
 ## damping of the suspension, shock absorbers
 ## in newton-seconds / meter
-@export var suspension_b: float = 3000.0
+@export var suspension_b: float = 3500.0
 
 ## when should the force of the bump be applied?
 ## percentage of the suspension length, 0..1
 ## example: 0.8, bump force starts in the last 20% compression
-@export var suspension_bump_start: float = 0.8
+@export var suspension_bump_start: float = 0.78
 ## spring constant of the bump stop
-@export var suspension_bump_k: float = 300000.0
+@export var suspension_bump_k: float = 270000.0
 
 ## maximum steer angle of the car
 @export var steer_angle_max_deg: float = 30.0
@@ -72,16 +77,25 @@ extends RigidBody3D
 @onready var enter_area = $enter_area
 @onready var enter_orig = $enter_area/enter_origin
 #@onready var car_mesh = $mesh
-# wheels
+# wheel raycasts
 @onready var w_fl: RayCast3D = $wheels/fl
 @onready var w_fr: RayCast3D = $wheels/fr
 @onready var w_rl: RayCast3D = $wheels/rl
 @onready var w_rr: RayCast3D = $wheels/rr
-
+# wheel meshes
 @onready var w_fl_m: MeshInstance3D = $wheels/fl/mesh_fl
 @onready var w_fr_m: MeshInstance3D = $wheels/fr/mesh_fr
 @onready var w_rl_m: MeshInstance3D = $wheels/rl/mesh_rl
 @onready var w_rr_m: MeshInstance3D = $wheels/rr/mesh_rr
+# wheel groups
+@onready var front_wheels: Array[RayCast3D] = [w_fl, w_fr]
+@onready var rear_wheels: Array[RayCast3D] = [w_rl, w_rr]
+@onready var wheel_meshes: Dictionary = {
+	w_fl: w_fl_m,
+	w_fr: w_fr_m,
+	w_rl: w_rl_m,
+	w_rr: w_rr_m
+}
 
 var riders: Array[CharacterBody3D] = []
 var total_mass := car_mass # add item masses here too
@@ -90,10 +104,12 @@ var total_mass := car_mass # add item masses here too
 func _ready():
 	self.mass = car_mass
 	riders.resize(seat_mkrs.size())
+	# set the raycast lengths
 	w_fl.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
 	w_fr.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
 	w_rl.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
 	w_rr.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
+	# enter area interactable
 	enter_area.body_entered.connect(_body_entered)
 	enter_area.body_exited.connect(_body_exited)
 
@@ -128,13 +144,16 @@ func _physics_process(delta):
 	w_rl.force_raycast_update()
 	w_rr.force_raycast_update()
 	
+	w_fl_m.rotation.y = -steer_angle
+	w_fr_m.rotation.y = -steer_angle
+	
 	# THROTTLE STUFF
 	
 	# forward and reverse throttle
 	# reverse will simply apply a negative force to 'brake'
 	# instead of braking then reverse
 	var drive_force: float = 0.0
-	if abs(drive_input) > deadzone and riders[0] != null:
+	if abs(drive_input) > deadzone and brake_input < deadzone and riders[0] != null:
 		# using formula engine_force = (power * input) / velocity
 		var total_power = max_power_watts * drivechain_efficiency
 		drive_force = (total_power * drive_input) / max(min_speed, s)
@@ -164,10 +183,14 @@ func _physics_process(delta):
 	var total_long_force = drive_force + brake_force + engine_force + resist_force
 	# apply the force
 	apply_central_force(forward * total_long_force)
-	_apply_suspension(w_fl, w_fl_m, delta)
-	_apply_suspension(w_fr, w_fr_m, delta)
-	_apply_suspension(w_rl, w_rl_m, delta)
-	_apply_suspension(w_rr, w_rr_m, delta)
+	var normal_fl := _apply_suspension(w_fl, w_fl_m, suspension_fk)
+	var normal_fr := _apply_suspension(w_fr, w_fr_m, suspension_fk)
+	var normal_rl := _apply_suspension(w_rl, w_rl_m, suspension_rk)
+	var normal_rr := _apply_suspension(w_rr, w_rr_m, suspension_rk)
+	_apply_tire_forces(w_fl, -steer_angle, normal_fl)
+	_apply_tire_forces(w_fr, -steer_angle, normal_fr)
+	_apply_tire_forces(w_rl, 0.0, normal_rl)
+	_apply_tire_forces(w_rr, 0.0, normal_rr)
 
 # when a body enters the enter area
 # underscore is for internal function
@@ -180,7 +203,7 @@ func _body_exited(body: Node) -> void:
 	if body is CharacterBody3D and body.has_method("set_interactable"):
 		body.clear_interactable(self)
 
-func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, delta: float) -> float:
+func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, spring_constant: float) -> float:
 	if not wheel.is_colliding():
 		# no force applied
 		mesh.position.y = -suspension_length + wheel_radius
@@ -210,7 +233,7 @@ func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, delta: float) -> 
 	var velocity_normal := velocity_point.dot(normal)
 	
 	# hookes law, force = spring_constant * displacement_x
-	var spring_force := x * suspension_k
+	var spring_force := x * spring_constant
 	# damping force formula, force = damping_coefficient * velocity
 	var damper_force := suspension_b * -velocity_normal
 	
@@ -227,8 +250,47 @@ func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, delta: float) -> 
 	# applies the force at normal direction, with the total force
 	# at the distance away from center of gravity (radius)
 	apply_force(normal * total_force, radius)
-	DebugDraw3D.draw_arrow_ray(point, total_force * normal * 0.001, 1,Color(0.846, 0.687, 0.939, 1.0),0.1)
-	return total_force
+	DebugDraw3D.draw_arrow_ray(point, total_force * normal * 0.001, 1,Color(0.75, 0.423, 0.94, 1.0),0.1)
+	return total_force # returns the final normal force essentially
+
+func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: float) -> void:
+	if not wheel.is_colliding():
+		return
+	
+	# where the point of contact is
+	var point := wheel.get_collision_point() 
+	# direction of the normal force
+	var normal := wheel.get_collision_normal() 
+	# the vector from the center of mass to the point of contact
+	# or also the distance from reference point to target point
+	var radius := point - global_transform.origin
+	# velocity at the point in the object
+	# calculated by velocity_target_point = velocity_reference_point + angular_velocity * radius
+	var velocity_point := linear_velocity + angular_velocity.cross(radius)
+	# remove any components, only forces in ground plane
+	velocity_point -= normal * velocity_point.dot(normal)
+	
+	# wheel directions, based on car unless front wheels
+	var forward := (-global_transform.basis.z).normalized()
+	var right := global_transform.basis.x.normalized()
+	
+	if wheel == w_fl or wheel == w_fr:
+		forward = forward.rotated(normal, steer_angle)
+		forward = forward.normalized()
+		right = right.rotated(normal, steer_angle)
+		right = right.normalized()
+	
+	var v_forward := velocity_point.dot(forward) # speed along the forward direction, -1 to 1
+	var v_right := velocity_point.dot(right)
+	
+	var tire_grip_force := -v_right * tire_stiffness * total_mass
+	
+	var tire_friction_force := tire_lat_cof * normal_force
+	
+	var total_lat_force: float = clamp(tire_grip_force, -tire_friction_force, tire_friction_force)
+	
+	apply_force(right * total_lat_force, radius)
+	DebugDraw3D.draw_arrow_ray(point, total_lat_force * right * 0.001, 1,Color(0.776, 0.94, 0.423, 1.0),0.1)
 
 # gets an open seat in the car, if there is any
 # returns -1 for full car
