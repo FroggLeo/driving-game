@@ -227,6 +227,7 @@ func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, delta: float) -> 
 	# applies the force at normal direction, with the total force
 	# at the distance away from center of gravity (radius)
 	apply_force(normal * total_force, radius)
+	DebugDraw3D.draw_arrow_ray(point, total_force * normal * 0.001, 1,Color(0.846, 0.687, 0.939, 1.0),0.1)
 	return total_force
 
 # gets an open seat in the car, if there is any
