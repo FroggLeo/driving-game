@@ -166,7 +166,8 @@ class WheelState:
 	
 	func update(car: RigidBody3D, w: WheelData, c: CarState):
 		on_floor = w.ray.is_colliding()
-		#if on_floor:
+		if not on_floor:
+			return
 		point = w.ray.get_collision_point() # where the point of contact is
 		normal = w.ray.get_collision_normal() # direction of the normal force
 		pos = w.ray.global_transform.origin # position of the wheel hub
@@ -178,8 +179,10 @@ class WheelState:
 		# the velocity of the normal force to the velocity of the point
 		velocity_normal = velocity_point.dot(normal)
 		# wheel directions, based on car unless front wheels
-		forward = c.forward.rotated(normal, c.current_steer).normalized()
-		right = c.right.rotated(normal, c.current_steer).normalized()
+		var steer: float = clamp(c.current_steer, -w.max_steer_angle, w.max_steer_angle)
+		# negative steer because its inverse
+		forward = c.forward.rotated(normal, -steer).normalized()
+		right = c.right.rotated(normal, -steer).normalized()
 		
 		v_forward = velocity_point.dot(forward) # speed along the forward direction, -1 to 1
 		v_right = velocity_point.dot(right)
@@ -189,10 +192,6 @@ func _ready():
 	self.mass = car_mass
 	riders.resize(seat_mkrs.size())
 	
-	# set the raycast lengths
-	for w in all_wheels:
-		w.ray.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
-	
 	front_wheels = [
 		WheelData.new(w_fl, w_fl_m, wheel_radius, suspension_fk, suspension_b, tire_f_lat_damping, steer_angle_max_deg),
 		WheelData.new(w_fr, w_fr_m, wheel_radius, suspension_fk, suspension_b, tire_f_lat_damping, steer_angle_max_deg)]
@@ -201,6 +200,9 @@ func _ready():
 		WheelData.new(w_rr, w_rr_m, wheel_radius, suspension_rk, suspension_b, tire_r_lat_damping, 0.0)]
 	all_wheels = front_wheels + rear_wheels
 	state = CarState.new()
+	# set the raycast lengths
+	for w in all_wheels:
+		w.ray.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
 	
 	# enter area interactable
 	enter_area.body_entered.connect(_body_entered)
@@ -208,11 +210,10 @@ func _ready():
 
 # movement code
 func _physics_process(_delta: float):
-	#if riders.size() == 0 or riders[0] == null:
-	#	return
-	
+	# update all states
 	state.update(self)
 	for w in all_wheels:
+		w.ray.force_raycast_update()
 		w.state.update(self, w, state)
 	
 	# REFACTORED LONGITUDINAL FORCES LOGIC
@@ -238,8 +239,7 @@ func _physics_process(_delta: float):
 	
 	# WHEEL STUFF
 	
-	for w in all_wheels:
-		w.ray.force_raycast_update()
+	
 	for w in front_wheels:
 		w.mesh.rotation.y = -state.current_steer
 	
@@ -267,7 +267,7 @@ func _apply_suspension(w: WheelData, ws: WheelState) -> float:
 	# the current spring length should be the total distance - wheel radius
 	var spring_length := ws.dist - w.radius
 	
-	w.mesh.position.y = spring_length # not working uh oh
+	w.mesh.position.y = -spring_length + w.radius
 	
 	# how much the spring is compressed
 	var x := suspension_length - spring_length
@@ -313,7 +313,9 @@ func _apply_tire_forces(w: WheelData, ws: WheelState, normal_force: float) -> fl
 	return total_lat_force
 
 func _apply_engine_forces(car: CarState, ws: WheelState, num_wheels: int, drive_input: float) -> float:
-	if drive_input > deadzone:
+	if not ws.on_floor:
+		return 0.0
+	if abs(drive_input) > deadzone:
 		var total_power = max_power_watts * drivechain_efficiency
 		# using formula engine_force = (power * input) / velocity
 		var throttle_force = (total_power * drive_input) / max(min_speed, car.s)
@@ -333,15 +335,19 @@ func _apply_drag_force(car: CarState) -> float:
 	return drag_force
 
 func _apply_roll_force(ws: WheelState, num_wheels: int) -> float:
+	if not ws.on_floor:
+		return 0.0
 	var roll_force = rolling_resistance_coef * total_mass * gravity
 	roll_force /= num_wheels
 	apply_force(ws.forward * roll_force * -sign(ws.v_forward), ws.radius)
 	return roll_force
 
 func _apply_brake_force(ws: WheelState, num_wheels: int, brake_input: float) -> float:
+	if not ws.on_floor:
+		return 0.0
 	var brake_force = max_brake_force * brake_input
 	brake_force /= num_wheels
-	apply_force(brake_force * -sign(ws.v_forward), ws.radius)
+	apply_force(ws.forward * brake_force * -sign(ws.v_forward), ws.radius)
 	return brake_force
 
 ## driving input maps are: throttle, reverse, steer_left, steer_right, brake
