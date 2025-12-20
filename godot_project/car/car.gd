@@ -37,9 +37,12 @@ extends RigidBody3D
 @export var tire_lat_cof: float = 0.80
 ## friction force left and right
 @export var tire_long_cof: float = 0.90
-## lateral damping coefficient of the tire
+## lateral damping coefficient of the front tire
 ## not real value, just tune to vibes
-@export var tire_lat_damping: float = 3000.0
+@export var tire_f_lat_damping: float = 5500.0
+## lateral damping coefficient of the rear tire
+## not real value, just tune to vibes
+@export var tire_r_lat_damping: float = 7500.0
 ## gravity
 @export var gravity: float = 9.81
 
@@ -191,11 +194,11 @@ func _physics_process(delta):
 	var normal_fr := _apply_suspension(w_fr, w_fr_m, suspension_fk)
 	var normal_rl := _apply_suspension(w_rl, w_rl_m, suspension_rk)
 	var normal_rr := _apply_suspension(w_rr, w_rr_m, suspension_rk)
-	var a := _apply_tire_forces(w_fl, -steer_angle, normal_fl)
+	var a := _apply_tire_forces(w_fl, -steer_angle, normal_fl, tire_f_lat_damping)
 	print("fl normal: ", normal_fl, " fl lateral: ", a)
-	_apply_tire_forces(w_fr, -steer_angle, normal_fr)
-	_apply_tire_forces(w_rl, 0.0, normal_rl)
-	_apply_tire_forces(w_rr, 0.0, normal_rr)
+	_apply_tire_forces(w_fr, -steer_angle, normal_fr, tire_f_lat_damping)
+	_apply_tire_forces(w_rl, 0.0, normal_rl, tire_r_lat_damping)
+	_apply_tire_forces(w_rr, 0.0, normal_rr, tire_r_lat_damping)
 
 # when a body enters the enter area
 # underscore is for internal function
@@ -258,7 +261,7 @@ func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, spring_constant: 
 	DebugDraw3D.draw_arrow_ray(point, total_force * normal * 0.001, 1,Color(0.75, 0.423, 0.94, 1.0),0.1)
 	return total_force # returns the final normal force essentially
 
-func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: float) -> float:
+func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: float, tire_lat_damping: float) -> float:
 	if not wheel.is_colliding():
 		return 0.0
 	
@@ -268,8 +271,9 @@ func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: floa
 	var normal := wheel.get_collision_normal() 
 	# the hub of the wheel
 	var hub := wheel.global_transform.origin
-	# the vector from the center of mass to the hub
+	# the vector from the center of mass to the hub or point of contact
 	# or also the distance from reference point to target point
+	# can use point or hub
 	var radius := hub - global_transform.origin
 	# velocity at the point in the object
 	# calculated by velocity_target_point = velocity_reference_point + angular_velocity * radius
@@ -281,19 +285,17 @@ func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: floa
 	var forward := (-global_transform.basis.z).normalized()
 	var right := global_transform.basis.x.normalized()
 	
-	if wheel == w_fl or wheel == w_fr:
-		forward = forward.rotated(normal, steer_angle)
-		forward = forward.normalized()
-		right = right.rotated(normal, steer_angle)
-		right = right.normalized()
+	forward = forward.rotated(normal, steer_angle).normalized()
+	right = right.rotated(normal, steer_angle).normalized()
 	
 	#var v_forward := velocity_point.dot(forward) # speed along the forward direction, -1 to 1
 	var v_right := velocity_point.dot(right)
 	
+	# calculated grip force of the tire itself
 	var tire_grip_force := -v_right * tire_lat_damping
-	
+	# the max grip force allowed, which is the force of friction
 	var tire_friction_force := tire_lat_cof * normal_force
-	
+	# final force calculated
 	var total_lat_force: float = clamp(tire_grip_force, -tire_friction_force, tire_friction_force)
 	
 	apply_force(right * total_lat_force, radius)
@@ -302,7 +304,8 @@ func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: floa
 	DebugDraw3D.draw_arrow_ray(hub, total_lat_force * right * 0.001, 1,Color(0.776, 0.94, 0.423, 1.0),0.1)
 	
 	return total_lat_force
-	
+
+func _apply_engine_forces()
 # gets an open seat in the car, if there is any
 # returns -1 for full car
 func get_open_seat() -> int:
