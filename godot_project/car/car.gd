@@ -33,16 +33,13 @@ extends RigidBody3D
 ## mass of the truck in kg
 @export var car_mass: float = 1700.0
 ## coefficient of friction of the wheels
-## tire coefficient of friction laterally, front and back
+## friction force laterally, front and back
 @export var tire_lat_cof: float = 0.80
-## tire coefficient of friction left and right
+## friction force left and right
 @export var tire_long_cof: float = 0.90
-## cornering stiffness of the front tire, in newtons/rad
-## used to calculate instantaneuous lateral force
-@export var tire_f_cornering_stiffness: float = 190000.0
-## cornering stiffness of the rear tire, in newtons/rad
-## used to calculate instantaneuous lateral force
-@export var tire_r_cornering_stiffness: float = 160000.0
+## lateral damping coefficient of the tire
+## not real value, just tune to vibes
+@export var tire_lat_damping: float = 3000.0
 ## gravity
 @export var gravity: float = 9.81
 
@@ -194,11 +191,11 @@ func _physics_process(delta):
 	var normal_fr := _apply_suspension(w_fr, w_fr_m, suspension_fk)
 	var normal_rl := _apply_suspension(w_rl, w_rl_m, suspension_rk)
 	var normal_rr := _apply_suspension(w_rr, w_rr_m, suspension_rk)
-	var a := _apply_tire_forces(w_fl, -steer_angle, normal_fl, tire_f_cornering_stiffness)
+	var a := _apply_tire_forces(w_fl, -steer_angle, normal_fl)
 	print("fl normal: ", normal_fl, " fl lateral: ", a)
-	_apply_tire_forces(w_fr, -steer_angle, normal_fr, tire_f_cornering_stiffness)
-	_apply_tire_forces(w_rl, 0.0, normal_rl, tire_r_cornering_stiffness)
-	_apply_tire_forces(w_rr, 0.0, normal_rr, tire_r_cornering_stiffness)
+	_apply_tire_forces(w_fr, -steer_angle, normal_fr)
+	_apply_tire_forces(w_rl, 0.0, normal_rl)
+	_apply_tire_forces(w_rr, 0.0, normal_rr)
 
 # when a body enters the enter area
 # underscore is for internal function
@@ -261,7 +258,7 @@ func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, spring_constant: 
 	DebugDraw3D.draw_arrow_ray(point, total_force * normal * 0.001, 1,Color(0.75, 0.423, 0.94, 1.0),0.1)
 	return total_force # returns the final normal force essentially
 
-func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: float, cornering_stiffness: float) -> float:
+func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: float) -> float:
 	if not wheel.is_colliding():
 		return 0.0
 	
@@ -273,7 +270,7 @@ func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: floa
 	var hub := wheel.global_transform.origin
 	# the vector from the center of mass to the hub
 	# or also the distance from reference point to target point
-	var radius := point - global_transform.origin
+	var radius := hub - global_transform.origin
 	# velocity at the point in the object
 	# calculated by velocity_target_point = velocity_reference_point + angular_velocity * radius
 	var velocity_point := linear_velocity + angular_velocity.cross(radius)
@@ -290,17 +287,11 @@ func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: floa
 		right = right.rotated(normal, steer_angle)
 		right = right.normalized()
 	
-	var v_forward := velocity_point.dot(forward) # speed along the forward direction, -1 to 1
+	#var v_forward := velocity_point.dot(forward) # speed along the forward direction, -1 to 1
 	var v_right := velocity_point.dot(right)
 	
+	var tire_grip_force := -v_right * tire_lat_damping
 	
-	# formula is arctan2d()
-	var slip_angle := atan2(v_right, abs(v_forward))
-	
-	# the force applied to the tires
-	var tire_grip_force := -cornering_stiffness * slip_angle
-	
-	# the maximum allowed force that can be applied is how much friction it has
 	var tire_friction_force := tire_lat_cof * normal_force
 	
 	var total_lat_force: float = clamp(tire_grip_force, -tire_friction_force, tire_friction_force)
@@ -308,7 +299,7 @@ func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: floa
 	apply_force(right * total_lat_force, radius)
 	
 	# debug
-	DebugDraw3D.draw_arrow_ray(point, total_lat_force * right * 0.001, 1,Color(0.776, 0.94, 0.423, 1.0),0.1)
+	DebugDraw3D.draw_arrow_ray(hub, total_lat_force * right * 0.001, 1,Color(0.776, 0.94, 0.423, 1.0),0.1)
 	
 	return total_lat_force
 	
