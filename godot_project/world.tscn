@@ -46,6 +46,32 @@ albedo_texture = ExtResource("6_dwbse")
 
 [node name="car" parent="." instance=ExtResource("1_aqk2v")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 4.0919533, 0)
+max_power_watts = null
+drivechain_efficiency = null
+max_tractive_force = null
+min_speed = null
+max_brake_force = null
+engine_brake_force_max = null
+engine_brake_fade_speed = null
+rolling_resistance_coef = null
+drag_coef = null
+drag_area = null
+air_density = null
+car_mass = null
+tire_lat_cof = null
+tire_long_cof = null
+tire_f_lat_damping = null
+tire_r_lat_damping = null
+gravity = null
+wheel_radius = null
+suspension_length = null
+suspension_fk = null
+suspension_rk = null
+suspension_b = null
+suspension_bump_start = null
+suspension_bump_k = null
+steer_angle_max_deg = null
+deadzone = null
 
 [node name="sky" parent="." instance=ExtResource("3_tlwt5")]
 day_length = 120.0

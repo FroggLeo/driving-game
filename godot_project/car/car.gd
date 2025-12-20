@@ -110,10 +110,8 @@ func _ready():
 	self.mass = car_mass
 	riders.resize(seat_mkrs.size())
 	# set the raycast lengths
-	w_fl.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
-	w_fr.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
-	w_rl.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
-	w_rr.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
+	for wheel in all_wheels:
+		wheel.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
 	# enter area interactable
 	enter_area.body_entered.connect(_body_entered)
 	enter_area.body_exited.connect(_body_exited)
@@ -135,16 +133,33 @@ func _physics_process(delta):
 	
 	var v := linear_velocity
 	var s := v.length()
-	var forward := (-global_transform.basis.z).normalized()
-	var v_forward := v.dot(forward) # speed along the forward direction, -1 to 1
-	var right := global_transform.basis.x.normalized()
-	var v_right := v.dot(right)
 	
-	
+	# temp steering code
 	var steer_angle := 0.0
-	
 	if riders[0] != null:
 		steer_angle = deg_to_rad(steer_angle_max_deg) * steer_input
+	
+	# REFACTORED LONGITUDINAL FORCES LOGIC
+	
+	if riders[0] != null:
+		if brake_input > deadzone:
+			# brakes
+			# braking overrides throttle
+			for wheel in all_wheels:
+				_apply_brake_force(wheel, all_wheels.size(), brake_input)
+		else:
+			# forward and reverse throttle
+			# reverse will simply apply a negative force to 'brake'
+			# instead of braking then reverse
+			for wheel in rear_wheels:
+				_apply_engine_forces(wheel, rear_wheels.size(), drive_input)
+	
+	# rolling resistance and aerodynamic drag
+	if s > 0.01:
+		_apply_drag_force(air_density, s, drag_area, drag_coef)
+		for wheel in all_wheels:
+			_apply_roll_force(wheel, all_wheels.size())
+	
 	# WHEEL STUFF
 	
 	w_fl.force_raycast_update()
@@ -155,33 +170,8 @@ func _physics_process(delta):
 	w_fl_m.rotation.y = -steer_angle
 	w_fr_m.rotation.y = -steer_angle
 	
-	# THROTTLE STUFF
-	
-	# forward and reverse throttle
-	# reverse will simply apply a negative force to 'brake'
-	# instead of braking then reverse
-	if brake_input < deadzone and riders[0] != null:
-		for wheel in rear_wheels:
-			_apply_engine_forces(wheel, drive_input, rear_wheels.size())
-	
-	# brakes
-	var brake_force: float = 0.0
-	if brake_input > deadzone and riders[0] != null:
-		brake_force = max_brake_force * brake_input * -sign(v_forward)
-	
-	
-	var engine_force: float = 0.0
-	if (abs(drive_input) <= deadzone or riders[0] == null) and abs(v_forward) > 0.01:
-		engine_force = -engine_brake_force_max * s / (s + engine_brake_fade_speed) * sign(v_forward)
-	
-	# rolling resistance and aerodynamic drag
-	var resist_force: float = 0.0
-	if s > 0.01:
-		# drag calculation based on the formula
-		var drag_force = air_density * s * s * drag_area * drag_coef / 2
-		var roll_force = rolling_resistance_coef * total_mass * gravity
-		# -sign(v_forward) allows us to apply the force in the opposite direction of the movement
-		resist_force = (drag_force + roll_force) * -sign(v_forward)
+	for wheel in all_wheels:
+		var normal_force = _apply_suspension(wheel, wheel_meshes.get(wheel), )
 	
 	var normal_fl := _apply_suspension(w_fl, w_fl_m, suspension_fk)
 	var normal_fr := _apply_suspension(w_fr, w_fr_m, suspension_fk)
@@ -298,7 +288,7 @@ func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: floa
 	
 	return total_lat_force
 
-func _apply_engine_forces(wheel: RayCast3D, drive_input: float, num_wheels: int) -> float:
+func _apply_engine_forces(wheel: RayCast3D, num_wheels: int, drive_input: float) -> float:
 	var velocity := linear_velocity
 	var speed = velocity.length()
 	var forward := (-global_transform.basis.z).normalized()
@@ -340,9 +330,27 @@ func _apply_roll_force(wheel: RayCast3D, num_wheels: int) -> float:
 	# can use point or hub
 	var radius := point - global_transform.origin
 	var roll_force = rolling_resistance_coef * total_mass * gravity
+	var velocity := linear_velocity
+	var forward := (-global_transform.basis.z).normalized()
+	var v_forward := velocity.dot(forward) # speed along the forward direction, -1 to 1
 	roll_force /= num_wheels
-	apply_force(roll_force, radius)
+	apply_force(roll_force * -sign(v_forward), radius)
 	return roll_force
+
+func _apply_brake_force(wheel: RayCast3D, num_wheels: int, brake_input: float) -> float:
+	# where the point of contact is
+	var point := wheel.get_collision_point() 
+	# the vector from the center of mass to the hub or point of contact
+	# or also the distance from reference point to target point
+	# can use point or hub
+	var radius := point - global_transform.origin
+	var velocity := linear_velocity
+	var forward := (-global_transform.basis.z).normalized()
+	var v_forward := velocity.dot(forward) # speed along the forward direction, -1 to 1
+	var brake_force = max_brake_force * brake_input
+	brake_force /= num_wheels
+	apply_force(brake_force * -sign(v_forward), radius)
+	return brake_force
 
 # gets an open seat in the car, if there is any
 # returns -1 for full car
