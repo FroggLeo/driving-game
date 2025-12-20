@@ -7,9 +7,6 @@ extends RigidBody3D
 @export var max_power_watts: float = 135000.0
 ## efficiency loss from the engine to the wheels
 @export var drivechain_efficiency: float = 0.88
-## the max traction allowed
-## so that the traction isn't infinite at 0 speed
-@export var max_tractive_force: float = 12000.0
 ## the minimum speed that is calculated, prevents insanely large numbers
 @export var min_speed: float = 1.0
 ## maximum force when braking
@@ -163,6 +160,7 @@ class WheelState:
 	var axis_forward: float # forward and back component of velocity at contact point
 	var dir_side: Vector3 # side to side direction of the wheel
 	var axis_side: float # side to side component of velocity at contact point
+	var normal_force: float # the current normal force of the wheel
 	
 	func update(car: RigidBody3D, w: WheelData, c: CarState):
 		is_grounded = w.ray.is_colliding()
@@ -189,6 +187,9 @@ class WheelState:
 		
 		axis_forward = vel_contact_world.dot(dir_forward) # speed along the forward direction, -1 to 1
 		axis_side = vel_contact_world.dot(dir_side)
+	
+	func update_normal_force(new_normal_force: float) -> void:
+		normal_force = new_normal_force
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -213,13 +214,18 @@ func _ready():
 
 # movement code
 func _physics_process(_delta: float):
-	# update all states
-	state.update(self)
-	for w in all_wheels:
+	state.update(self) # update car state
+	for w in all_wheels: # update all wheel rays and states
 		w.ray.force_raycast_update()
 		w.state.update(self, w, state)
+	# update driver status
 	var has_driver: bool = riders.size() > 0 and riders[0] != null
-	# REFACTORED LONGITUDINAL FORCES LOGIC
+	
+	for w in all_wheels:
+		var normal_force = _apply_suspension(w, w.state)
+		w.state.update_normal_force(normal_force) # update wheel state with the new normal force
+		_apply_tire_forces(w, w.state) # apply the basic tire grip and stuff
+		w.mesh.rotation.y = clamp(state.current_steer, -w.max_steer_angle, w.max_steer_angle)
 	
 	if has_driver:
 		if i_brake > deadzone:
@@ -239,16 +245,6 @@ func _physics_process(_delta: float):
 		_apply_drag_force(state)
 		for w in all_wheels:
 			_apply_roll_force(w.state, all_wheels.size())
-	
-	# WHEEL STUFF
-	
-	
-	for w in front_wheels:
-		w.mesh.rotation.y = state.current_steer
-	
-	for w in all_wheels:
-		var normal_force = _apply_suspension(w, w.state)
-		_apply_tire_forces(w, w.state, normal_force)
 
 # when a body enters the enter area
 # underscore is for internal function
@@ -297,14 +293,14 @@ func _apply_suspension(w: WheelData, ws: WheelState) -> float:
 	DebugDraw3D.draw_arrow_ray(ws.contact_point, total_force * ws.contact_normal * 0.001, 1,Color(0.75, 0.423, 0.94, 1.0),0.1)
 	return total_force # returns the final normal force essentially
 
-func _apply_tire_forces(w: WheelData, ws: WheelState, normal_force: float) -> float:
+func _apply_tire_forces(w: WheelData, ws: WheelState) -> float:
 	if not ws.is_grounded:
 		return 0.0
 	
 	# calculated grip force of the tire itself
 	var tire_grip_force := -ws.axis_side * w.lat_damping
 	# the max grip force allowed, which is the force of friction
-	var tire_friction_force := tire_lat_cof * normal_force
+	var tire_friction_force := tire_lat_cof * ws.normal_force
 	# final force calculated
 	var total_lat_force: float = clamp(tire_grip_force, -tire_friction_force, tire_friction_force)
 	
@@ -322,8 +318,9 @@ func _apply_engine_forces(car: CarState, ws: WheelState, num_wheels: int, drive_
 		var total_power = max_power_watts * drivechain_efficiency
 		# using formula engine_force = (power * input) / velocity
 		var throttle_force = (total_power * drive_input) / max(min_speed, car.speed)
-		# FIXME cap throttle force at max traction/friction
 		throttle_force /= num_wheels # split force amongst all wheels
+		var max_force = tire_long_cof * ws.normal_force
+		throttle_force = clamp(throttle_force, -max_force, max_force)
 		apply_force(throttle_force * ws.dir_forward, ws.r_com_to_contact)
 		return throttle_force
 	else:
