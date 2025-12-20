@@ -215,42 +215,23 @@ func _physics_process(_delta: float):
 	for w in all_wheels:
 		w.state.update(self, w, state)
 	
-	# NOTE
-	# driving input maps are: throttle, reverse, steer_left, steer_right, brake
-	# other include: interact
-	# these should all go from 0 to 1
-	# HACK need to move controls to player side
-	var throttle_input := Input.get_action_strength("throttle")
-	var reverse_input := Input.get_action_strength("reverse")
-	var brake_input := Input.get_action_strength("brake")
-	var drive_input := throttle_input - reverse_input # the overall throttle or reverse input
-	var steer_input := Input.get_axis("steer_left", "steer_right")
-	
-	var v := linear_velocity
-	var s := v.length()
-	
-	# temp steering code
-	var steer_angle := 0.0
-	if riders[0] != null:
-		steer_angle = deg_to_rad(steer_angle_max_deg) * steer_input
-	
 	# REFACTORED LONGITUDINAL FORCES LOGIC
 	
 	if riders[0] != null:
-		if brake_input > deadzone:
+		if i_brake > deadzone:
 			# brakes
 			# braking overrides throttle
 			for w in all_wheels:
-				_apply_brake_force(w.state, all_wheels.size(), brake_input)
+				_apply_brake_force(w.state, all_wheels.size(), i_brake)
 		else:
 			# forward and reverse throttle
 			# reverse will simply apply a negative force to 'brake'
 			# instead of braking then reverse
 			for w in rear_wheels:
-				_apply_engine_forces(state, w.state, rear_wheels.size(), drive_input)
+				_apply_engine_forces(state, w.state, rear_wheels.size(), i_drive)
 	
 	# rolling resistance and aerodynamic drag
-	if s > 0.01:
+	if state.s > 0.01:
 		_apply_drag_force(state)
 		for w in all_wheels:
 			_apply_roll_force(w.state, all_wheels.size())
@@ -260,7 +241,7 @@ func _physics_process(_delta: float):
 	for w in all_wheels:
 		w.ray.force_raycast_update()
 	for w in front_wheels:
-		w.mesh.rotation.y = -steer_angle
+		w.mesh.rotation.y = -state.current_steer
 	
 	for w in all_wheels:
 		var normal_force = _apply_suspension(w, w.state)
@@ -286,7 +267,7 @@ func _apply_suspension(w: WheelData, ws: WheelState) -> float:
 	# the current spring length should be the total distance - wheel radius
 	var spring_length := ws.dist - w.radius
 	
-	w.mesh.position.y = ws.dist
+	w.mesh.position.y = spring_length # not working uh oh
 	
 	# how much the spring is compressed
 	var x := suspension_length - spring_length
@@ -362,6 +343,16 @@ func _apply_brake_force(ws: WheelState, num_wheels: int, brake_input: float) -> 
 	brake_force /= num_wheels
 	apply_force(brake_force * -sign(ws.v_forward), ws.radius)
 	return brake_force
+
+## driving input maps are: throttle, reverse, steer_left, steer_right, brake
+## these should all go from 0 to 1
+func update_input(throttle: float, reverse: float, brake: float, steer: float) -> bool:
+	i_throttle = throttle
+	i_reverse = reverse
+	i_brake = brake
+	i_drive = i_throttle - i_reverse # the overall throttle or reverse input
+	i_steer = steer
+	return true # inputs accepted
 
 # gets an open seat in the car, if there is any
 # returns -1 for full car

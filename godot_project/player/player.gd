@@ -106,6 +106,8 @@ func _physics_process(delta):
 	
 	if v_driving:
 		global_transform = v_seat_mkr.global_transform
+		v_driven_car.update_input(Input.get_action_strength("throttle"), Input.get_action_strength("reverse"),
+		Input.get_action_strength("brake"), Input.get_axis("steer_left", "steer_right"))
 		if Input.is_action_just_pressed("interact"):
 			exit_vehicle(v_driven_car)
 		return
