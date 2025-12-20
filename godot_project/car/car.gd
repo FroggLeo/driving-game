@@ -81,6 +81,8 @@ extends RigidBody3D
 @onready var enter_area = $enter_area
 @onready var enter_orig = $enter_area/enter_origin
 #@onready var car_mesh = $mesh
+
+# wheel stuff
 # wheel raycasts
 @onready var w_fl: RayCast3D = $wheels/fl
 @onready var w_fr: RayCast3D = $wheels/fr
@@ -91,33 +93,107 @@ extends RigidBody3D
 @onready var w_fr_m: MeshInstance3D = $wheels/fr/mesh_fr
 @onready var w_rl_m: MeshInstance3D = $wheels/rl/mesh_rl
 @onready var w_rr_m: MeshInstance3D = $wheels/rr/mesh_rr
-# wheel groups
-@onready var front_wheels: Array[RayCast3D] = [w_fl, w_fr]
-@onready var rear_wheels: Array[RayCast3D] = [w_rl, w_rr]
-@onready var all_wheels: Array[RayCast3D] = front_wheels + rear_wheels
-@onready var wheel_meshes: Dictionary = {
-	w_fl: w_fl_m,
-	w_fr: w_fr_m,
-	w_rl: w_rl_m,
-	w_rr: w_rr_m
-}
 
+# wheel groups
+var front_wheels: Array[WheelData]
+var rear_wheels: Array[WheelData]
+var all_wheels: Array[WheelData]
+# car state
+var car_state: CarState
+# car properties
 var riders: Array[CharacterBody3D] = []
 var total_mass := car_mass # add item masses here too
+# inputs
+var throttle: float = 0.0
+var reverse: float = 0.0
+var drive: float = 0.0
+var brake: float = 0.0
+var steer: float = 0.0
+
+class CarState:
+	var v: Vector3
+	var s: float
+	var forward: Vector3
+	var v_forward: float
+	var right: Vector3
+	var v_right: float
+	#var steer_angle: float
+	#var has_driver: bool
+	func update(car: RigidBody3D) -> void:
+		v = car.linear_velocity
+		s = v.length()
+		forward = (-car.global_transform.basis.z).normalized()
+		v_forward = v.dot(forward) # speed along the forward direction, -1 to 1
+		right = car.global_transform.basis.x.normalized()
+		v_right = v.dot(right)
+		#steer_angle = 
+
+class WheelData:
+	# can add new data types if needed
+	var ray: RayCast3D
+	var mesh: MeshInstance3D
+	var spring_k: float
+	var lat_damp: float
+	var steer_angle: float
+	#var state: WheelState
+	
+	func _init(new_ray: RayCast3D, new_mesh: MeshInstance3D, new_spring_k: float, new_lat_damp: float,
+	new_steer_angle_deg: float):
+		ray = new_ray
+		mesh = new_mesh
+		spring_k = new_spring_k
+		lat_damp = new_lat_damp
+		steer_angle = deg_to_rad(new_steer_angle_deg)
+		#state = new_state
+
+class WheelState:
+	var on_floor: bool
+	var point: Vector3
+	var normal: Vector3
+	var pos: Vector3
+	var dist: float
+	var radius: Vector3
+	var velocity_point: Vector3
+	var velocity_normal: float
+	func update(car: RigidBody3D, w: WheelData, c: CarState):
+		if w.ray.is_colliding():
+			on_floor = true
+			point = w.ray.get_collision_point() # where the point of contact is
+			normal = w.ray.get_collision_normal() # direction of the normal force
+			pos = w.ray.global_transform.origin # position of the wheel hub
+			dist = pos.distance_to(point) # distance from the hub to the ground
+			radius = point - car.global_transform.origin # the distance from reference point to target point
+			# velocity at the point in the object
+			# calculated by velocity_target_point = velocity_reference_point + angular_velocity * radius
+			velocity_point = car.linear_velocity + car.angular_velocity.cross(radius)
+			# the velocity of the normal force to the velocity of the point
+			velocity_normal = velocity_point.dot(normal)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.mass = car_mass
 	riders.resize(seat_mkrs.size())
+	
 	# set the raycast lengths
-	for wheel in all_wheels:
-		wheel.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
+	for w in all_wheels:
+		w.ray.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
+	
+	front_wheels = [
+		WheelData.new(w_fl, w_fl_m, suspension_fk, tire_f_lat_damping, steer_angle_max_deg),
+		WheelData.new(w_fr, w_fr_m, suspension_fk, tire_f_lat_damping, steer_angle_max_deg)]
+	rear_wheels = [
+		WheelData.new(w_rl, w_rl_m, suspension_rk, tire_r_lat_damping, 0.0),
+		WheelData.new(w_rr, w_rr_m, suspension_rk, tire_r_lat_damping, 0.0)]
+	all_wheels = front_wheels + rear_wheels
+	
+	car_state = CarState.new()
+	
 	# enter area interactable
 	enter_area.body_entered.connect(_body_entered)
 	enter_area.body_exited.connect(_body_exited)
 
 # movement code
-func _physics_process(delta):
+func _physics_process(_delta: float):
 	#if riders.size() == 0 or riders[0] == null:
 	#	return
 	# NOTE
@@ -162,26 +238,14 @@ func _physics_process(delta):
 	
 	# WHEEL STUFF
 	
-	w_fl.force_raycast_update()
-	w_fr.force_raycast_update()
-	w_rl.force_raycast_update()
-	w_rr.force_raycast_update()
+	for w in all_wheels:
+		w.ray.force_raycast_update()
+	for w in front_wheels:
+		w.mesh.rotation.y = -steer_angle
 	
-	w_fl_m.rotation.y = -steer_angle
-	w_fr_m.rotation.y = -steer_angle
-	
-	for wheel in all_wheels:
-		var normal_force = _apply_suspension(wheel, wheel_meshes.get(wheel), )
-	
-	var normal_fl := _apply_suspension(w_fl, w_fl_m, suspension_fk)
-	var normal_fr := _apply_suspension(w_fr, w_fr_m, suspension_fk)
-	var normal_rl := _apply_suspension(w_rl, w_rl_m, suspension_rk)
-	var normal_rr := _apply_suspension(w_rr, w_rr_m, suspension_rk)
-	var a := _apply_tire_forces(w_fl, -steer_angle, normal_fl, tire_f_lat_damping)
-	print("fl normal: ", normal_fl, " fl lateral: ", a)
-	_apply_tire_forces(w_fr, -steer_angle, normal_fr, tire_f_lat_damping)
-	_apply_tire_forces(w_rl, 0.0, normal_rl, tire_r_lat_damping)
-	_apply_tire_forces(w_rr, 0.0, normal_rr, tire_r_lat_damping)
+	for w in all_wheels:
+		var normal_force = _apply_suspension(w)
+		_apply_tire_forces(w, normal_force)
 
 # when a body enters the enter area
 # underscore is for internal function
@@ -194,21 +258,21 @@ func _body_exited(body: Node) -> void:
 	if body is CharacterBody3D and body.has_method("set_interactable"):
 		body.clear_interactable(self)
 
-func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, spring_constant: float) -> float:
-	if not wheel.is_colliding():
+func _apply_suspension(w: WheelData) -> float:
+	if not w.is_colliding():
 		# no force applied
-		mesh.position.y = -suspension_length + wheel_radius
+		w.mesh.position.y = -suspension_length + wheel_radius
 		return 0.0
 	
-	var point := wheel.get_collision_point() # where the point of contact is
-	var normal := wheel.get_collision_normal() # direction of the normal force
-	var pos := wheel.global_transform.origin # position of the wheel hub
+	var point := w.ray.get_collision_point() # where the point of contact is
+	var normal := w.ray.get_collision_normal() # direction of the normal force
+	var pos := w.ray.global_transform.origin # position of the wheel hub
 	var dist := pos.distance_to(point) # distance from the hub to the ground
 	
 	# the current spring length should be the total distance - wheel radius
 	var spring_length := dist - wheel_radius
 	
-	mesh.position.y = -spring_length + wheel_radius
+	w.mesh.position.y = -spring_length + wheel_radius
 	
 	# how much the spring is compressed
 	var x := suspension_length - spring_length
@@ -217,14 +281,10 @@ func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, spring_constant: 
 	# the vector from the center of mass to the point of contact
 	# or also the distance from reference point to target point
 	var radius := point - global_transform.origin
-	# velocity at the point in the object
-	# calculated by velocity_target_point = velocity_reference_point + angular_velocity * radius
-	var velocity_point := linear_velocity + angular_velocity.cross(radius)
-	# the velocity of the normal force to the velocity of the point
-	var velocity_normal := velocity_point.dot(normal)
+	
 	
 	# hookes law, force = spring_constant * displacement_x
-	var spring_force := x * spring_constant
+	var spring_force := x * w.spring_k
 	# damping force formula, force = damping_coefficient * velocity
 	var damper_force := suspension_b * -velocity_normal
 	
@@ -244,7 +304,7 @@ func _apply_suspension(wheel: RayCast3D, mesh: MeshInstance3D, spring_constant: 
 	DebugDraw3D.draw_arrow_ray(point, total_force * normal * 0.001, 1,Color(0.75, 0.423, 0.94, 1.0),0.1)
 	return total_force # returns the final normal force essentially
 
-func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: float, tire_lat_damping: float) -> float:
+func _apply_tire_forces(wheel: WheelData, steer_angle: float, normal_force: float, tire_lat_damping: float) -> float:
 	if not wheel.is_colliding():
 		return 0.0
 	
@@ -288,7 +348,7 @@ func _apply_tire_forces(wheel: RayCast3D, steer_angle: float, normal_force: floa
 	
 	return total_lat_force
 
-func _apply_engine_forces(wheel: RayCast3D, num_wheels: int, drive_input: float) -> float:
+func _apply_engine_forces(wheel: WheelData, num_wheels: int, drive_input: float) -> float:
 	var velocity := linear_velocity
 	var speed = velocity.length()
 	var forward := (-global_transform.basis.z).normalized()
@@ -322,7 +382,7 @@ func _apply_drag_force(air_density: float, speed: float, drag_area: float, drag_
 	apply_central_force(forward * drag_force * -sign(v_forward))
 	return drag_force
 
-func _apply_roll_force(wheel: RayCast3D, num_wheels: int) -> float:
+func _apply_roll_force(wheel: WheelData, num_wheels: int) -> float:
 	# where the point of contact is
 	var point := wheel.get_collision_point() 
 	# the vector from the center of mass to the hub or point of contact
@@ -337,7 +397,7 @@ func _apply_roll_force(wheel: RayCast3D, num_wheels: int) -> float:
 	apply_force(roll_force * -sign(v_forward), radius)
 	return roll_force
 
-func _apply_brake_force(wheel: RayCast3D, num_wheels: int, brake_input: float) -> float:
+func _apply_brake_force(wheel: WheelData, num_wheels: int, brake_input: float) -> float:
 	# where the point of contact is
 	var point := wheel.get_collision_point() 
 	# the vector from the center of mass to the hub or point of contact
