@@ -64,6 +64,20 @@ extends RigidBody3D
 
 ## maximum steer angle of the car
 @export var steer_angle_max_deg: float = 30.0
+## maximum torque the driver can put on the steering wheel
+## in N * m
+@export var steer_driver_max_torque: float = 120.0
+## power assist level gain
+## 0 is none, 1 is normal, >1 is easy to turn
+@export var steer_power_assist: float = 1.0
+## rotational intertia of the steering wheel and column
+## in kg * meter^2
+@export var steer_inertia: float = 0.04
+## steering damping coefficient in Newton-meters * second / rad
+@export var steer_damping: float = 0.5
+## stiffness of the spring, the force that self centers
+## Newton-meters / rad
+@export var steer_stiffness: float = 8
 
 ## dedzone of the input
 ## amounts below this will not be considered
