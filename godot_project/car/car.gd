@@ -44,13 +44,13 @@ extends RigidBody3D
 @export var gravity: float = 9.81
 
 ## radius of the wheel in meters
-@export var wheel_radius: float = 0.33
+@export var wheel_radius: float = 0.45
 ## the length of the suspension
-@export var suspension_length: float = 0.30
+@export var suspension_length: float = 0.127
 ## spring constant per front wheel, in newtons/meter
-@export var suspension_fk: float = 40000.0
+@export var suspension_fk: float = 78000.0
 ## spring constant per rear wheel, in newtons/meter
-@export var suspension_rk: float = 37000.0
+@export var suspension_rk: float = 52000.0
 ## damping of the suspension, shock absorbers
 ## in newton-seconds / meter
 @export var suspension_b: float = 3500.0
@@ -150,6 +150,7 @@ class WheelData:
 	var damper_b: float # the damper constant b of the suspension
 	var lat_damping: float # the lateral damping value of the tire
 	var max_steer_angle: float # the max steer angle of the wheel in radians
+	var spin_angle: float # the angle of the wheel rotation
 	
 	func _init(new_ray: RayCast3D, new_mesh: MeshInstance3D, new_radius: float, new_spring_k: float, 
 	new_damper_b: float, new_lat_damping: float, steer_angle_deg: float):
@@ -227,7 +228,7 @@ func _ready():
 	enter_area.body_exited.connect(_body_exited)
 
 # movement code
-func _physics_process(_delta: float):
+func _physics_process(delta: float):
 	state.update(self) # update car state
 	for w in all_wheels: # update all wheel rays and states
 		w.ray.force_raycast_update()
@@ -239,7 +240,12 @@ func _physics_process(_delta: float):
 		var normal_force = _apply_suspension(w, w.state)
 		w.state.update_normal_force(normal_force) # update wheel state with the new normal force
 		_apply_tire_forces(w, w.state) # apply the basic tire grip and stuff
-		w.mesh.rotation.y = clamp(state.current_steer, -w.max_steer_angle, w.max_steer_angle)
+		var steer: float = clamp(state.current_steer, -w.max_steer_angle, w.max_steer_angle)
+		var omega := 0.0 # angular velocity from rolling
+		if w.state.is_grounded:
+			omega = w.state.axis_forward / max(0.001, w.wheel_radius)
+		w.spin_angle = wrapf(w.spin_angle + omega * delta, -TAU, TAU)
+		w.mesh.rotation = Vector3(-w.spin_angle, steer, PI/2)
 	
 	if has_driver:
 		if i_brake > deadzone:
@@ -274,13 +280,13 @@ func _body_exited(body: Node) -> void:
 func _apply_suspension(w: WheelData, ws: WheelState) -> float:
 	if not ws.is_grounded:
 		# no force applied
-		w.mesh.position.y = -suspension_length + w.wheel_radius
+		w.mesh.position.y = -suspension_length
 		return 0.0
 	
 	# the current spring length should be the total distance - wheel radius
 	var spring_length := ws.hub_contact_dist - w.wheel_radius
 	
-	w.mesh.position.y = -spring_length + w.wheel_radius
+	w.mesh.position.y = -spring_length
 	
 	# how much the spring is compressed
 	var x := suspension_length - spring_length
