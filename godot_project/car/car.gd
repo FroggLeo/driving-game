@@ -66,7 +66,7 @@ extends RigidBody3D
 @export var steer_angle_max_deg: float = 30.0
 ## maximum torque the driver can put on the steering wheel
 ## in N * m
-@export var steer_driver_max_torque: float = 120.0
+@export var steer_driver_max_torque: float = 60.2
 ## power assist level gain
 ## 0 is none, 1 is normal, >1 is easy to turn
 @export var steer_power_assist: float = 1.0
@@ -109,6 +109,9 @@ extends RigidBody3D
 var front_wheels: Array[WheelData]
 var rear_wheels: Array[WheelData]
 var all_wheels: Array[WheelData]
+# steering state
+var steer_angle: float = 0.0
+var steer_angle_vel: float = 0.0
 # car state
 var state: CarState
 # car properties
@@ -138,7 +141,7 @@ class CarState:
 		dir_lat = car.global_transform.basis.x.normalized()
 		axis_lat = vel_world.dot(dir_lat)
 		# TODO update steering system
-		current_steer = car.i_steer * deg_to_rad(car.steer_angle_max_deg)
+		current_steer = car.steer_angle
 
 class WheelData:
 	# can add new data types if needed
@@ -230,6 +233,7 @@ func _ready():
 # movement code
 func _physics_process(delta: float):
 	state.update(self) # update car state
+	_update_steering(delta) # update steering
 	for w in all_wheels: # update all wheel rays and states
 		w.ray.force_raycast_update()
 		w.state.update(self, w, state)
@@ -371,14 +375,48 @@ func _apply_brake_force(ws: WheelState, num_wheels: int, brake_input: float) -> 
 	apply_force(ws.dir_forward * brake_force * -sign(ws.axis_forward), ws.r_com_to_contact)
 	return brake_force
 
+func _update_steering(delta: float) -> void:
+	var max_angle := deg_to_rad(steer_angle_max_deg)
+	var input: float = clamp(i_steer, -1.0, 1.0)
+	# the target angle that the player wants
+	var target_angle := input * max_angle
+	# the steering curve, so that steering is heavier at speed
+	var speed_gain := 1.0 / (1.0 + state.speed / 18.0)
+	# difference between current angle and target angle
+	var error := target_angle - steer_angle
+	var driver_torque := steer_stiffness * error - steer_damping * steer_angle_vel
+	# still self center when no input 
+	var assist_floor := 0.35
+	var authority: float = lerp(assist_floor, 1.0, abs(input))
+	# max amount of torque on the steering wheel
+	var max_torque := steer_driver_max_torque * steer_power_assist * speed_gain * authority
+	var total_torque: float = clamp(driver_torque, -max_torque, max_torque)
+	# calculate steer angle and steer angle velocity
+	var s_inertia: float = max(steer_inertia, 1e-4)
+	var ang_accel := total_torque / s_inertia
+	
+	steer_angle_vel += ang_accel * delta
+	steer_angle += steer_angle_vel * delta
+	
+	if steer_angle > max_angle:
+		steer_angle = max_angle
+		# no more velocity if we are pushing to the max angle already
+		if steer_angle_vel > 0.0:
+			steer_angle_vel = 0.0
+	elif steer_angle < -max_angle:
+		steer_angle = -max_angle
+		# no more velocity if we are pushing to the max angle already
+		if steer_angle_vel < 0.0:
+			steer_angle_vel = 0.0
+
 ## driving input maps are: throttle, reverse, steer_left, steer_right, brake
 ## these should all go from 0 to 1
 func update_input(throttle: float, reverse: float, brake: float, steer: float) -> bool:
-	i_throttle = throttle
-	i_reverse = reverse
-	i_brake = brake
-	i_drive = i_throttle - i_reverse # the overall throttle or reverse input
-	i_steer = steer
+	i_throttle = clamp(throttle, 0.0, 1.0)
+	i_reverse = clamp(reverse, 0.0, 1.0)
+	i_brake = clamp(brake, 0.0, 1.0)
+	i_drive = clamp(i_throttle - i_reverse, -1.0, 1.0) # the overall throttle or reverse input
+	i_steer = clamp(steer, -1.0, 1.0)
 	return true # inputs accepted
 
 # gets an open seat in the car, if there is any
