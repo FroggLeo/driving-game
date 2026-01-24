@@ -66,7 +66,7 @@ extends RigidBody3D
 @export var steer_angle_max_deg: float = 30.0
 ## maximum torque the driver can put on the steering wheel
 ## in N * m
-@export var steer_driver_max_torque: float = 60.2
+@export var steer_driver_max_torque: float = 120.2
 ## power assist level gain
 ## 0 is none, 1 is normal, >1 is easy to turn
 @export var steer_power_assist: float = 1.0
@@ -74,10 +74,18 @@ extends RigidBody3D
 ## in kg * meter^2
 @export var steer_inertia: float = 0.04
 ## steering damping coefficient in Newton-meters * second / rad
-@export var steer_damping: float = 0.5
+@export var steer_damping: float = 0.7
 ## stiffness of the spring, the force that self centers
 ## Newton-meters / rad
 @export var steer_stiffness: float = 8
+## the steer friction force when we are at 0 speed, N*m
+@export var steer_friction_static: float = 10.0
+## steer friction when at speed, N*m
+@export var steer_friction_dynamic: float = 2.5
+## static friction fade speed, m/s
+@export var steer_friction_speed: float = 4.0
+## no jittering at small values, rad/s
+@export var steer_friction_deadzone: float = 0.02
 
 ## dedzone of the input
 ## amounts below this will not be considered
@@ -104,6 +112,11 @@ extends RigidBody3D
 @onready var w_fr_m: MeshInstance3D = $wheels/fr/mesh_fr
 @onready var w_rl_m: MeshInstance3D = $wheels/rl/mesh_rl
 @onready var w_rr_m: MeshInstance3D = $wheels/rr/mesh_rr
+# wheel shapecasts
+@onready var w_fl_sc: ShapeCast3D = $wheels/fl/sc_fl
+@onready var w_fr_sc: ShapeCast3D = $wheels/fr/sc_fr
+@onready var w_rl_sc: ShapeCast3D = $wheels/rl/sc_rl
+@onready var w_rr_sc: ShapeCast3D = $wheels/rr/sc_rr
 
 # wheel groups
 var front_wheels: Array[WheelData]
@@ -140,13 +153,13 @@ class CarState:
 		axis_long = vel_world.dot(dir_long) # speed along the forward direction, -1 to 1
 		dir_lat = car.global_transform.basis.x.normalized()
 		axis_lat = vel_world.dot(dir_lat)
-		# TODO update steering system
 		current_steer = car.steer_angle
 
 class WheelData:
 	# can add new data types if needed
 	var state: WheelState = WheelState.new() # the wheel state object
 	var ray: RayCast3D # the raycast node of the wheel
+	var shapecast: ShapeCast3D # the shapecast node of the wheels
 	var mesh: MeshInstance3D # the mesh node of the wheel
 	var wheel_radius: float # the radius of the wheel
 	var spring_k: float # the spring constant k of the suspension
@@ -155,9 +168,10 @@ class WheelData:
 	var max_steer_angle: float # the max steer angle of the wheel in radians
 	var spin_angle: float # the angle of the wheel rotation
 	
-	func _init(new_ray: RayCast3D, new_mesh: MeshInstance3D, new_radius: float, new_spring_k: float, 
+	func _init(new_ray: RayCast3D, new_shapecast: ShapeCast3D, new_mesh: MeshInstance3D, new_radius: float, new_spring_k: float, 
 	new_damper_b: float, new_lat_damping: float, steer_angle_deg: float):
 		ray = new_ray
+		shapecast = new_shapecast
 		mesh = new_mesh
 		wheel_radius = new_radius
 		spring_k = new_spring_k
@@ -215,16 +229,17 @@ func _ready():
 	riders.resize(seat_mkrs.size())
 	
 	front_wheels = [
-		WheelData.new(w_fl, w_fl_m, wheel_radius, suspension_fk, suspension_b, tire_f_lat_damping, steer_angle_max_deg),
-		WheelData.new(w_fr, w_fr_m, wheel_radius, suspension_fk, suspension_b, tire_f_lat_damping, steer_angle_max_deg)]
+		WheelData.new(w_fl, w_fl_sc, w_fl_m, wheel_radius, suspension_fk, suspension_b, tire_f_lat_damping, steer_angle_max_deg),
+		WheelData.new(w_fr, w_fr_sc, w_fr_m, wheel_radius, suspension_fk, suspension_b, tire_f_lat_damping, steer_angle_max_deg)]
 	rear_wheels = [
-		WheelData.new(w_rl, w_rl_m, wheel_radius, suspension_rk, suspension_b, tire_r_lat_damping, 0.0),
-		WheelData.new(w_rr, w_rr_m, wheel_radius, suspension_rk, suspension_b, tire_r_lat_damping, 0.0)]
+		WheelData.new(w_rl, w_rl_sc, w_rl_m, wheel_radius, suspension_rk, suspension_b, tire_r_lat_damping, 0.0),
+		WheelData.new(w_rr, w_rr_sc, w_rr_m, wheel_radius, suspension_rk, suspension_b, tire_r_lat_damping, 0.0)]
 	all_wheels = front_wheels + rear_wheels
 	state = CarState.new()
 	# set the raycast lengths
 	for w in all_wheels:
 		w.ray.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
+		w.shapecast.add_exception(self)
 	
 	# enter area interactable
 	enter_area.body_entered.connect(_body_entered)
@@ -285,12 +300,14 @@ func _apply_suspension(w: WheelData, ws: WheelState) -> float:
 	if not ws.is_grounded:
 		# no force applied
 		w.mesh.position.y = -suspension_length
+		w.shapecast.position.y = -suspension_length
 		return 0.0
 	
 	# the current spring length should be the total distance - wheel radius
 	var spring_length := ws.hub_contact_dist - w.wheel_radius
 	
 	w.mesh.position.y = -spring_length
+	w.shapecast.position.y = -spring_length
 	
 	# how much the spring is compressed
 	var x := suspension_length - spring_length
@@ -386,11 +403,23 @@ func _update_steering(delta: float) -> void:
 	var error := target_angle - steer_angle
 	var driver_torque := steer_stiffness * error - steer_damping * steer_angle_vel
 	# still self center when no input 
-	var assist_floor := 0.35
+	var assist_floor: float = 0.3
 	var authority: float = lerp(assist_floor, 1.0, abs(input))
 	# max amount of torque on the steering wheel
 	var max_torque := steer_driver_max_torque * steer_power_assist * speed_gain * authority
 	var total_torque: float = clamp(driver_torque, -max_torque, max_torque)
+	# low speed friction
+	var friction_gain: float = 1.0 / (1.0 + state.speed / max(0.01, steer_friction_speed))
+	var friction_limit: float = lerp(steer_friction_dynamic, steer_friction_static, friction_gain)
+	if abs(i_steer) > 0.05:
+		friction_limit = steer_friction_dynamic  # don't use huge static friction while steering
+	if abs(steer_angle_vel) < steer_friction_deadzone: 
+		total_torque -= friction_limit * sign(total_torque)
+	else:
+		if abs(total_torque) <= friction_limit:
+			total_torque = 0.0
+		else:
+			total_torque -= friction_limit * sign(total_torque)
 	# calculate steer angle and steer angle velocity
 	var s_inertia: float = max(steer_inertia, 1e-4)
 	var ang_accel := total_torque / s_inertia

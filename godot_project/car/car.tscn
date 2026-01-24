@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://c8rg4afao8hqe"]
+[gd_scene load_steps=23 format=3 uid="uid://c8rg4afao8hqe"]
 
 [ext_resource type="Script" uid="uid://c4o4i021y0hua" path="res://car/car.gd" id="1_2gitb"]
 [ext_resource type="Texture2D" uid="uid://b8rfh8lvub85a" path="res://addons/kenney_prototype_textures/green/texture_08.png" id="2_hkabp"]
@@ -50,6 +50,22 @@ height = 0.26
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xhmyn"]
 albedo_texture = ExtResource("3_jpe8o")
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hkabp"]
+height = 0.26
+radius = 0.45
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_jpe8o"]
+height = 0.26
+radius = 0.45
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_h3fet"]
+height = 0.26
+radius = 0.45
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_bkrhx"]
+height = 0.26
+radius = 0.45
 
 [node name="car" type="RigidBody3D"]
 center_of_mass_mode = 1
@@ -141,6 +157,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0, -0.6)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.50000006)
 
 [node name="fl" type="RayCast3D" parent="wheels"]
+process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.79999995, 0.1, -1.6999999)
 
 [node name="mesh_fl" type="MeshInstance3D" parent="wheels/fl"]
@@ -148,7 +165,15 @@ transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0
 mesh = SubResource("CylinderMesh_dxy33")
 surface_material_override/0 = SubResource("StandardMaterial3D_xhmyn")
 
+[node name="sc_fl" type="ShapeCast3D" parent="wheels/fl"]
+process_physics_priority = -1
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_hkabp")
+target_position = Vector3(0, 0, 0)
+max_results = 3
+
 [node name="fr" type="RayCast3D" parent="wheels"]
+process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.79999995, 0.1, -1.6999999)
 
 [node name="mesh_fr" type="MeshInstance3D" parent="wheels/fr"]
@@ -156,7 +181,15 @@ transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0
 mesh = SubResource("CylinderMesh_dxy33")
 surface_material_override/0 = SubResource("StandardMaterial3D_xhmyn")
 
+[node name="sc_fr" type="ShapeCast3D" parent="wheels/fr"]
+process_physics_priority = -1
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_jpe8o")
+target_position = Vector3(0, 0, 0)
+max_results = 3
+
 [node name="rl" type="RayCast3D" parent="wheels"]
+process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.79999995, 0.1, 1.5)
 
 [node name="mesh_rl" type="MeshInstance3D" parent="wheels/rl"]
@@ -164,10 +197,25 @@ transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0
 mesh = SubResource("CylinderMesh_dxy33")
 surface_material_override/0 = SubResource("StandardMaterial3D_xhmyn")
 
+[node name="sc_rl" type="ShapeCast3D" parent="wheels/rl"]
+process_physics_priority = -1
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_h3fet")
+target_position = Vector3(0, 0, 0)
+max_results = 3
+
 [node name="rr" type="RayCast3D" parent="wheels"]
+process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.79999995, 0.1, 1.5)
 
 [node name="mesh_rr" type="MeshInstance3D" parent="wheels/rr"]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 mesh = SubResource("CylinderMesh_dxy33")
 surface_material_override/0 = SubResource("StandardMaterial3D_xhmyn")
+
+[node name="sc_rr" type="ShapeCast3D" parent="wheels/rr"]
+process_physics_priority = -1
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_bkrhx")
+target_position = Vector3(0, 0, 0)
+max_results = 3
