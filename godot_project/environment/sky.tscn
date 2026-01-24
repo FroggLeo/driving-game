@@ -1,10 +1,83 @@
-[gd_scene load_steps=9 format=3 uid="uid://cmvvu0pixwdta"]
+[gd_scene load_steps=10 format=3 uid="uid://cmvvu0pixwdta"]
 
-[ext_resource type="Material" uid="uid://bkvdhlri11df5" path="res://environment/sky_shader.tres" id="1_t5sdn"]
+[ext_resource type="Shader" uid="uid://d3iso5igfujbc" path="res://environment/realistic.gdshader" id="1_t5sdn"]
 [ext_resource type="Script" uid="uid://bhq4nv4os3os0" path="res://environment/sky.gd" id="2_dptxg"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rdg10"]
+shader = ExtResource("1_t5sdn")
+shader_parameter/camera_altitude = 1.0
+shader_parameter/exposure = 11.0
+shader_parameter/base_sky_color = Color(0, 0.0039, 0.0275, 1)
+shader_parameter/atm_density = 1.0
+shader_parameter/sun_strength = 300.0
+shader_parameter/sun_size_deg = 2.0
+shader_parameter/sun_softness = 0.2
+shader_parameter/sun_glow_size = 3.0
+shader_parameter/sun_glow_strength = 1.5
+shader_parameter/sun_base_color = Color(1, 1, 1, 1)
+shader_parameter/enable_moon = true
+shader_parameter/moon_strength = 1.0
+shader_parameter/moon_size_deg = 5.0
+shader_parameter/moon_softness = 0.03
+shader_parameter/moon_base_color = Color(1, 0.988, 0.926, 1)
+shader_parameter/enable_earthshine = true
+shader_parameter/earthshine_strength = 0.0035
+shader_parameter/earthshine_color = Color(0.502, 0.652, 1, 1)
+shader_parameter/enable_moon_glow = false
+shader_parameter/moon_glow_size = 1.5
+shader_parameter/moon_glow_strength = 0.25
+shader_parameter/moon_limb_softness = 0.05
+shader_parameter/enable_stars = true
+shader_parameter/stars_pitch = 0.0
+shader_parameter/stars_strength = 0.05
+shader_parameter/stars_max_size = 0.35
+shader_parameter/stars_min_size = 0.3
+shader_parameter/stars_density = 1.0
+shader_parameter/stars_amount = 0.1
+shader_parameter/stars_softness = 0.03
+shader_parameter/stars_color = Color(1, 0.9725, 0.9059, 1)
+shader_parameter/stars_color_variation = 0.3
+shader_parameter/stars_moon_fade = 0.6
+shader_parameter/stars_seed = 67.6767
+shader_parameter/rayleigh_strength = 1.0
+shader_parameter/rayleigh_scale_height = 8300.0
+shader_parameter/mie_strength = 1.0
+shader_parameter/mie_scale_height = 1200.0
+shader_parameter/mie_g = 0.85
+shader_parameter/ozone_strength = 1.0
+shader_parameter/ozone_scale_height = 7000.0
+shader_parameter/ozone_peak_altitude = 20000.0
+shader_parameter/enable_fog = true
+shader_parameter/fog_amount = 0.0
+shader_parameter/fog_horizon_power = 4.0
+shader_parameter/fog_density = 1.5
+shader_parameter/fog_color = Color(0.7708, 0.8118, 0.8314, 1)
+shader_parameter/view_ray_steps = 32
+shader_parameter/sun_ray_steps = 3
+shader_parameter/enable_truncate = true
+shader_parameter/view_ray_truncate = 12
+shader_parameter/enable_truncate_fade = true
+shader_parameter/truncate_fade_height = 1000.0
+shader_parameter/enable_importance_sampling = true
+shader_parameter/is_factor = 1.0
+shader_parameter/rayleigh_weight = 0.0
+shader_parameter/mie_weight = 0.0
+shader_parameter/ozone_weight = 0.0
+shader_parameter/enable_adaptive_step = false
+shader_parameter/as_factor = 10.0
+shader_parameter/view_ray_min_steps = 16
+shader_parameter/view_ray_max_steps = 36
+shader_parameter/sun_ray_min_steps = 3
+shader_parameter/sun_ray_max_steps = 3
+shader_parameter/enable_artistic_effects = false
+shader_parameter/horizon_saturation = 1.0
+shader_parameter/horizon_size = 20.0
+shader_parameter/horizon_hue_1 = 0.8
+shader_parameter/horizon_hue_2 = 0.0
+shader_parameter/sun_transition = 5.5
+
 [sub_resource type="Sky" id="Sky_t5sdn"]
-sky_material = ExtResource("1_t5sdn")
+sky_material = SubResource("ShaderMaterial_rdg10")
 
 [sub_resource type="Environment" id="Environment_rdg10"]
 background_mode = 2
@@ -26,16 +99,16 @@ material = SubResource("StandardMaterial3D_djljc")
 environment = SubResource("Environment_rdg10")
 script = ExtResource("2_dptxg")
 sun_energy = 1.0
+time = 0.505
 
 [node name="sun_tilt" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.9999999, 0, 0, 0, 0.9999999, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 0.91705996, -0.39874902, 0, 0.39874902, 0.91705996, 0, 0, 0)
 
 [node name="sun" type="Node3D" parent="sun_tilt"]
-transform = Transform3D(1, 0, 0, 0, 0.8290376, -0.5591929, 0, 0.5591929, 0.8290376, 0, 0, 0)
+transform = Transform3D(-0.99950653, 0.031410858, 0, -0.026040783, -0.8286285, -0.5591929, -0.017564729, -0.5589169, 0.8290376, 0, 0, 0)
 
 [node name="sun_light" type="DirectionalLight3D" parent="sun_tilt/sun"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
-light_energy = 3.0
 light_volumetric_fog_energy = 2.0
 
 [node name="sun_mesh" type="MeshInstance3D" parent="sun_tilt/sun"]
@@ -43,12 +116,14 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -
 mesh = SubResource("SphereMesh_gr5xt")
 
 [node name="moon_tilt" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9170601, -0.39874908, 0, 0.39874908, 0.9170601, 0, 0, 0)
 
 [node name="moon" type="Node3D" parent="moon_tilt"]
-transform = Transform3D(1, 0, 0, 0, 0.8290376, -0.5591929, 0, 0.5591929, 0.8290376, 0, 0, 0)
+transform = Transform3D(-0.99950653, 0.031410858, 0, -0.026040783, -0.8286285, -0.5591929, -0.017564729, -0.5589169, 0.8290376, 0, 0, 0)
 
 [node name="moon_light" type="DirectionalLight3D" parent="moon_tilt/moon"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 5, 0)
+light_energy = 0.136
 
 [node name="moon_mesh" type="MeshInstance3D" parent="moon_tilt/moon"]
 transform = Transform3D(0.7, 0, 0, 0, -3.059797e-08, -0.7, 0, 0.7, -3.059797e-08, 0, 5, 0)
