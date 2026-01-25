@@ -111,9 +111,6 @@ extends RigidBody3D
 var front_wheels: Array[WheelData]
 var rear_wheels: Array[WheelData]
 var all_wheels: Array[WheelData]
-# steering state
-var steer_angle: float = 0.0
-var steer_angle_vel: float = 0.0
 # car state
 var state: CarState
 # car properties
@@ -133,7 +130,8 @@ class CarState:
 	var dir_lat: Vector3 # side to side/latitude direction
 	var axis_long: float # longitude component of the velocity
 	var axis_lat: float # latitiude component of the velocity
-	var current_steer: float # current steer angle
+	var steer_angle: float # current steer angle
+	var steer_angle_vel: float # current steer angle velocity
 	#var has_driver: bool
 	func update(car: RigidBody3D) -> void:
 		vel_world = car.linear_velocity
@@ -142,7 +140,9 @@ class CarState:
 		axis_long = vel_world.dot(dir_long) # speed along the forward direction, -1 to 1
 		dir_lat = car.global_transform.basis.x.normalized()
 		axis_lat = vel_world.dot(dir_lat)
-		current_steer = car.steer_angle
+	func update_steering(new_steer_angle: float, new_steer_angle_vel: float):
+		steer_angle = new_steer_angle
+		steer_angle_vel = new_steer_angle_vel
 
 class WheelData:
 	# can add new data types if needed
@@ -201,7 +201,7 @@ class WheelState:
 		# the velocity of the normal force to the velocity of the point
 		vel_contact_normal = vel_contact_world.dot(contact_normal)
 		# wheel directions, based on car unless front wheels
-		var steer: float = clamp(c.current_steer, -w.max_steer_angle, w.max_steer_angle)
+		var steer: float = clamp(c.steer_angle, -w.max_steer_angle, w.max_steer_angle)
 		# negative steer because its inverse
 		dir_forward = c.dir_long.rotated(contact_normal, steer).normalized()
 		dir_side = c.dir_lat.rotated(contact_normal, steer).normalized()
@@ -228,7 +228,6 @@ func _ready():
 	# set the raycast lengths
 	for w in all_wheels:
 		w.ray.target_position = Vector3(0, -(wheel_radius + suspension_length + 0.1), 0)
-		w.shapecast.add_exception(self)
 	
 	# enter area interactable
 	enter_area.body_entered.connect(_body_entered)
@@ -248,7 +247,7 @@ func _physics_process(delta: float):
 		var normal_force = _apply_suspension(w, w.state)
 		w.state.update_normal_force(normal_force) # update wheel state with the new normal force
 		_apply_tire_forces(w, w.state) # apply the basic tire grip and stuff
-		var steer: float = clamp(state.current_steer, -w.max_steer_angle, w.max_steer_angle)
+		var steer: float = clamp(state.steer_angle, -w.max_steer_angle, w.max_steer_angle)
 		var omega := 0.0 # angular velocity from rolling
 		if w.state.is_grounded:
 			omega = w.state.axis_forward / max(0.001, w.wheel_radius)
@@ -289,14 +288,14 @@ func _apply_suspension(w: WheelData, ws: WheelState) -> float:
 	if not ws.is_grounded:
 		# no force applied
 		w.mesh.position.y = -suspension_length
-		w.shapecast.position.y = -suspension_length
+		#w.shapecast.position.y = -suspension_length
 		return 0.0
 	
 	# the current spring length should be the total distance - wheel radius
 	var spring_length := ws.hub_contact_dist - w.wheel_radius
 	
 	w.mesh.position.y = -spring_length
-	w.shapecast.position.y = -spring_length
+	#w.shapecast.position.y = -spring_length
 	
 	# how much the spring is compressed
 	var x := suspension_length - spring_length
@@ -386,6 +385,9 @@ func _update_steering(delta: float) -> void:
 	var input: float = clamp(i_steer, -1.0, 1.0)
 	# the target angle that the player wants
 	var target_angle := input * max_angle
+	# current steer angle
+	var steer_angle := state.steer_angle
+	var steer_angle_vel := state.steer_angle_vel
 	# the error between the target angle and the actual steer angle
 	var error := target_angle - steer_angle
 	# the slope/ramp/curve for the self centering
@@ -399,6 +401,7 @@ func _update_steering(delta: float) -> void:
 	var center_torque: float = 0.0
 	for w in all_wheels:
 		if w.max_steer_angle > 0.0 and w.state.is_grounded:
+			# self center only when a steerable wheel is touching the ground
 			center_torque = steer_center_k * center_factor * -steer_angle - steer_center_d * steer_angle_vel
 			break
 	if abs(center_torque) < 1e-3: center_torque = 0.0
@@ -418,7 +421,7 @@ func _update_steering(delta: float) -> void:
 		steer_angle = -max_angle
 		# no more velocity if we are pushing to the max angle already
 		steer_angle_vel = max(0.0, steer_angle_vel)
-	print("center: ", center_torque, "\ndriver: ", driver_torque, "\nangle: ", steer_angle, "\nangle accel: ",angle_accel)
+	state.update_steering(steer_angle, steer_angle_vel)
 
 ## driving input maps are: throttle, reverse, steer_left, steer_right, brake
 ## these should all go from 0 to 1
