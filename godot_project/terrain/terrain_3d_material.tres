@@ -23,6 +23,10 @@ seamless = true
 
 [resource]
 _shader_parameters = {
+&"auto_base_texture": 0,
+&"auto_height_reduction": 0.1,
+&"auto_overlay_texture": 1,
+&"auto_slope": 1.0,
 &"bias_distance": 512.0,
 &"blend_sharpness": 0.5,
 &"depth_blur": 0.0,
@@ -40,4 +44,4 @@ _shader_parameters = {
 &"noise_texture": SubResource("NoiseTexture2D_m6sr0"),
 &"projection_threshold": 0.8
 }
-show_checkered = true
+auto_shader = true
