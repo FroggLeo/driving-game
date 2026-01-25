@@ -70,15 +70,15 @@ extends RigidBody3D
 @export var steer_driver_d: float = 1.2
 ## self centering speed ramp, N*m / rad at high speed
 @export var steer_center_k: float = 5.0
+## self centering damping N*m*s / rad
+@export var steer_center_d: float = 0.6
 ## inertia of steering kg*m^2
 @export var steer_inertia: float = 0.04
-## friction of the steering, so no small number jitters, N*m
-@export var steer_friction: float = 1.0
 ## the speed in m/s where the self centering is at 50% power
-@export var steer_center_speed: float = 6.0
+@export var steer_center_speed: float = 11.0
 ## dedzone of the input
 ## amounts below this will not be considered
-@export var deadzone: float = 0.01
+@export var deadzone: float = 0.001
 
 # nodes used
 # arrays should be same length
@@ -389,30 +389,26 @@ func _update_steering(delta: float) -> void:
 	# the error between the target angle and the actual steer angle
 	var error := target_angle - steer_angle
 	# the slope/ramp/curve for the self centering
-	var v := state.speed
-	var center_factor: float = v / (v + max(0.01, steer_center_speed))
+	var s := state.speed
+	var center_factor: float = s / (s + max(0.001, steer_center_speed))
 	# the torque of the driver, push towards the target angle
 	var driver_torque := steer_driver_k * error - steer_driver_d * steer_angle_vel
-	if abs(target_angle) < 1e-4: driver_torque = 0.0
+	if abs(target_angle) < deadzone: driver_torque = 0.0
 	# the self centering torque, gets stronger as speed increases, push towards 0
 	# currently gets weaker as the angle decreases, not ideal, it gets really slow at lower angles
-	var center_torque: float = steer_center_k * center_factor * -steer_angle
-	#center_torque = max(center_torque, center_factor * 50.0 * sign(steer_angle))
+	var center_torque: float = 0.0
+	for w in all_wheels:
+		if w.max_steer_angle > 0.0 and w.state.is_grounded:
+			center_torque = steer_center_k * center_factor * -steer_angle - steer_center_d * steer_angle_vel
+			break
+	if abs(center_torque) < 1e-3: center_torque = 0.0
 	# total torque that will be applied now
 	var total_torque := driver_torque + center_torque
-	# remove tiny osciliations
-	if abs(steer_angle_vel) < 0.01:
-		if abs(total_torque) <= steer_friction:
-			total_torque = 0.0
-		else:
-			total_torque -= steer_friction * sign(total_torque)
-	else:
-		total_torque -= steer_friction * sign(steer_angle_vel)
-	# calculate steer angle and steer angle velocity
-	var s_inertia: float = max(steer_inertia, 1e-4)
-	var ang_accel := total_torque / s_inertia
-	steer_angle_vel += ang_accel * delta
-	steer_angle += steer_angle_vel * delta
+	# get the velocity and actual angle
+	var angle_accel := total_torque / steer_inertia # acceleration
+	if abs(angle_accel) > 1e-4:
+		steer_angle_vel += angle_accel * delta # velocity
+		steer_angle += steer_angle_vel * delta # angle
 	# steering limits/ hard stops
 	if steer_angle > max_angle:
 		steer_angle = max_angle
@@ -422,7 +418,7 @@ func _update_steering(delta: float) -> void:
 		steer_angle = -max_angle
 		# no more velocity if we are pushing to the max angle already
 		steer_angle_vel = max(0.0, steer_angle_vel)
-	print("center: ", center_torque, "\n driver: ", driver_torque)
+	print("center: ", center_torque, "\ndriver: ", driver_torque, "\nangle: ", steer_angle, "\nangle accel: ",angle_accel)
 
 ## driving input maps are: throttle, reverse, steer_left, steer_right, brake
 ## these should all go from 0 to 1
