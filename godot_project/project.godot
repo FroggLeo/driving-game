@@ -25,7 +25,7 @@ settings/addon_root_folder="res://addons/debug_draw_3d"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_super-wakatime/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_super-wakatime/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
 
 [input]
 
