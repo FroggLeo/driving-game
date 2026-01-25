@@ -64,29 +64,18 @@ extends RigidBody3D
 
 ## maximum steer angle of the car
 @export var steer_angle_max_deg: float = 30.0
-## maximum torque the driver can put on the steering wheel
-## in N * m
-@export var steer_driver_max_torque: float = 120.2
-## power assist level gain
-## 0 is none, 1 is normal, >1 is easy to turn
-@export var steer_power_assist: float = 1.0
-## rotational intertia of the steering wheel and column
-## in kg * meter^2
+## driver steer torque N*m / rad
+@export var steer_driver_k: float = 18.0
+## driver steer damping N*m*s / rad
+@export var steer_driver_d: float = 1.2
+## self centering speed ramp, N*m / rad at high speed
+@export var steer_center_k: float = 5.0
+## inertia of steering kg*m^2
 @export var steer_inertia: float = 0.04
-## steering damping coefficient in Newton-meters * second / rad
-@export var steer_damping: float = 0.7
-## stiffness of the spring, the force that self centers
-## Newton-meters / rad
-@export var steer_stiffness: float = 8
-## the steer friction force when we are at 0 speed, N*m
-@export var steer_friction_static: float = 10.0
-## steer friction when at speed, N*m
-@export var steer_friction_dynamic: float = 2.5
-## static friction fade speed, m/s
-@export var steer_friction_speed: float = 4.0
-## no jittering at small values, rad/s
-@export var steer_friction_deadzone: float = 0.02
-
+## friction of the steering, so no small number jitters, N*m
+@export var steer_friction: float = 1.0
+## the speed in m/s where the self centering is at 50% power
+@export var steer_center_speed: float = 6.0
 ## dedzone of the input
 ## amounts below this will not be considered
 @export var deadzone: float = 0.01
@@ -397,46 +386,43 @@ func _update_steering(delta: float) -> void:
 	var input: float = clamp(i_steer, -1.0, 1.0)
 	# the target angle that the player wants
 	var target_angle := input * max_angle
-	# the steering curve, so that steering is heavier at speed
-	var speed_gain := 1.0 / (1.0 + state.speed / 18.0)
-	# difference between current angle and target angle
+	# the error between the target angle and the actual steer angle
 	var error := target_angle - steer_angle
-	var driver_torque := steer_stiffness * error - steer_damping * steer_angle_vel
-	# still self center when no input 
-	var assist_floor: float = 0.3
-	var authority: float = lerp(assist_floor, 1.0, abs(input))
-	# max amount of torque on the steering wheel
-	var max_torque := steer_driver_max_torque * steer_power_assist * speed_gain * authority
-	var total_torque: float = clamp(driver_torque, -max_torque, max_torque)
-	# low speed friction
-	var friction_gain: float = 1.0 / (1.0 + state.speed / max(0.01, steer_friction_speed))
-	var friction_limit: float = lerp(steer_friction_dynamic, steer_friction_static, friction_gain)
-	if abs(i_steer) > 0.05:
-		friction_limit = steer_friction_dynamic  # don't use huge static friction while steering
-	if abs(steer_angle_vel) < steer_friction_deadzone: 
-		total_torque -= friction_limit * sign(total_torque)
-	else:
-		if abs(total_torque) <= friction_limit:
+	# the slope/ramp/curve for the self centering
+	var v := state.speed
+	var center_factor: float = v / (v + max(0.01, steer_center_speed))
+	# the torque of the driver, push towards the target angle
+	var driver_torque := steer_driver_k * error - steer_driver_d * steer_angle_vel
+	if abs(target_angle) < 1e-4: driver_torque = 0.0
+	# the self centering torque, gets stronger as speed increases, push towards 0
+	# currently gets weaker as the angle decreases, not ideal, it gets really slow at lower angles
+	var center_torque: float = steer_center_k * center_factor * -steer_angle
+	#center_torque = max(center_torque, center_factor * 50.0 * sign(steer_angle))
+	# total torque that will be applied now
+	var total_torque := driver_torque + center_torque
+	# remove tiny osciliations
+	if abs(steer_angle_vel) < 0.01:
+		if abs(total_torque) <= steer_friction:
 			total_torque = 0.0
 		else:
-			total_torque -= friction_limit * sign(total_torque)
+			total_torque -= steer_friction * sign(total_torque)
+	else:
+		total_torque -= steer_friction * sign(steer_angle_vel)
 	# calculate steer angle and steer angle velocity
 	var s_inertia: float = max(steer_inertia, 1e-4)
 	var ang_accel := total_torque / s_inertia
-	
 	steer_angle_vel += ang_accel * delta
 	steer_angle += steer_angle_vel * delta
-	
+	# steering limits/ hard stops
 	if steer_angle > max_angle:
 		steer_angle = max_angle
 		# no more velocity if we are pushing to the max angle already
-		if steer_angle_vel > 0.0:
-			steer_angle_vel = 0.0
+		steer_angle_vel = min(0.0, steer_angle_vel)
 	elif steer_angle < -max_angle:
 		steer_angle = -max_angle
 		# no more velocity if we are pushing to the max angle already
-		if steer_angle_vel < 0.0:
-			steer_angle_vel = 0.0
+		steer_angle_vel = max(0.0, steer_angle_vel)
+	print("center: ", center_torque, "\n driver: ", driver_torque)
 
 ## driving input maps are: throttle, reverse, steer_left, steer_right, brake
 ## these should all go from 0 to 1
