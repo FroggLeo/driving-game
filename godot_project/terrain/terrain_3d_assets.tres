@@ -27,14 +27,15 @@ lod0_range = 128.0
 name = "rock"
 albedo_texture = ExtResource("1_oifc5")
 normal_texture = ExtResource("2_mksqd")
-uv_scale = 0.005
+roughness = 0.2
+uv_scale = 0.004
 
 [sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_3hsgy"]
 name = "rocky grass"
 id = 1
 albedo_texture = ExtResource("3_67h0u")
 normal_texture = ExtResource("4_6e4m6")
-uv_scale = 0.005
+uv_scale = 0.004
 
 [resource]
 mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_kuir1")])

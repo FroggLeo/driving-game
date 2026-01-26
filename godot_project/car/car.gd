@@ -3,6 +3,8 @@ extends RigidBody3D
 # tuned to a compact pickup truck w/ 1 row of seats
 # NOT kei truck!!! legal in america!!!
 
+## debug arrows
+@export var debug: bool = false
 ## using watts to be realistic and have a dynamic top speed
 @export var max_power_watts: float = 135000.0
 ## efficiency loss from the engine to the wheels
@@ -319,7 +321,8 @@ func _apply_suspension(w: WheelData, ws: WheelState) -> float:
 	# applies the force at normal direction, with the total force
 	# at the distance away from center of gravity (radius)
 	apply_force(ws.contact_normal * total_force, ws.r_com_to_contact)
-	DebugDraw3D.draw_arrow_ray(ws.contact_point, total_force * ws.contact_normal * 0.001, 1,Color(0.75, 0.423, 0.94, 1.0),0.1)
+	if debug:
+		DebugDraw3D.draw_arrow_ray(ws.contact_point, total_force * ws.contact_normal * 0.001, 1,Color(0.75, 0.423, 0.94, 1.0),0.1)
 	return total_force # returns the final normal force essentially
 
 func _apply_tire_forces(w: WheelData, ws: WheelState) -> float:
@@ -336,7 +339,8 @@ func _apply_tire_forces(w: WheelData, ws: WheelState) -> float:
 	apply_force(ws.dir_side * total_lat_force, ws.r_com_to_contact)
 	
 	# debug
-	DebugDraw3D.draw_arrow_ray(ws.contact_point, total_lat_force * ws.dir_side * 0.001, 1,Color(0.776, 0.94, 0.423, 1.0),0.1)
+	if debug:
+		DebugDraw3D.draw_arrow_ray(ws.contact_point, total_lat_force * ws.dir_side * 0.001, 1,Color(0.776, 0.94, 0.423, 1.0),0.1)
 	
 	return total_lat_force
 
