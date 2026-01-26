@@ -66,6 +66,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_gbfbk")
 data_directory = "res://terrain/terraindata"
 material = ExtResource("5_dwbse")
 assets = ExtResource("6_pkg7o")
+show_contours = true
 top_level = true
 metadata/_edit_lock_ = true
 
