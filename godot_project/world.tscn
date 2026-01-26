@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=13 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://c8rg4afao8hqe" path="res://car/car.tscn" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
@@ -6,6 +6,7 @@
 [ext_resource type="Terrain3DMaterial" uid="uid://cpwmhhyhwr2n" path="res://terrain/terrain_3d_material.tres" id="5_dwbse"]
 [ext_resource type="Texture2D" uid="uid://b7fcui7yb5fo0" path="res://addons/kenney_prototype_textures/red/texture_08.png" id="6_dwbse"]
 [ext_resource type="Terrain3DAssets" uid="uid://qnbod831dic6" path="res://terrain/terrain_3d_assets.tres" id="6_pkg7o"]
+[ext_resource type="Shader" uid="uid://xouchkbyqx1d" path="res://environment/water.gdshader" id="7_pkg7o"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dwbse"]
 
@@ -13,6 +14,27 @@
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gbfbk"]
 albedo_texture = ExtResource("6_dwbse")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gbfbk"]
+render_priority = 0
+shader = ExtResource("7_pkg7o")
+shader_parameter/depth_fade_distance = 1.0
+shader_parameter/absorbance = 2.0
+shader_parameter/shallow_color = Color(0.22, 0.66, 1, 1)
+shader_parameter/deep_color = Color(0, 0.25, 0.45, 1)
+shader_parameter/foam_amount = 0.2
+shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/roughness = 0.05
+shader_parameter/wave_scale = 4.0
+shader_parameter/height_scale = 0.15
+shader_parameter/wave_dir1 = Vector2(1, 0)
+shader_parameter/wave_dir2 = Vector2(0, 1)
+shader_parameter/wave_speed = 0.015
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ioo17"]
+size = Vector2(30000, 30000)
+subdivide_width = 1
+subdivide_depth = 1
 
 [node name="World" type="Node3D"]
 
@@ -46,3 +68,8 @@ material = ExtResource("5_dwbse")
 assets = ExtResource("6_pkg7o")
 top_level = true
 metadata/_edit_lock_ = true
+
+[node name="ocean" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+material_override = SubResource("ShaderMaterial_gbfbk")
+mesh = SubResource("PlaneMesh_ioo17")

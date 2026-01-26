@@ -44,5 +44,6 @@ _shader_parameters = {
 &"noise_texture": SubResource("NoiseTexture2D_m6sr0"),
 &"projection_threshold": 0.8
 }
+world_background = 0
 texture_filtering = 1
 auto_shader = true
