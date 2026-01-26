@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://gv5bygqdbrxp"]
+
+[ext_resource type="Texture2D" uid="uid://b8vrdwjjbs67p" path="res://assets/textures/tree low.png" id="1_rnhcc"]
+
+[resource]
+transparency = 1
+cull_mode = 2
+albedo_texture = ExtResource("1_rnhcc")

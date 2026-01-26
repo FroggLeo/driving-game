@@ -1,24 +1,17 @@
 [gd_resource type="Terrain3DAssets" load_steps=9 format=3 uid="uid://qnbod831dic6"]
 
+[ext_resource type="Material" uid="uid://cbxy6yryob8nl" path="res://terrain/features/grass.tres" id="1_mksqd"]
 [ext_resource type="Texture2D" uid="uid://qao6p6jef7oa" path="res://terrain/assets/rock_alb_ht.dds" id="1_oifc5"]
 [ext_resource type="Texture2D" uid="uid://cpdavtebtnvug" path="res://terrain/assets/rock_nrm_rgh.dds" id="2_mksqd"]
 [ext_resource type="Texture2D" uid="uid://cbjgksu2uc1uj" path="res://terrain/assets/rocky_grass_alb_ht.png" id="3_67h0u"]
 [ext_resource type="Texture2D" uid="uid://cl13xei0bjtd7" path="res://terrain/assets/rocky_grass_nrm_rgh.png" id="4_6e4m6"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tsvha"]
-transparency = 4
-cull_mode = 2
-vertex_color_use_as_albedo = true
-backlight_enabled = true
-backlight = Color(0.5, 0.5, 0.5, 1)
-distance_fade_mode = 1
-distance_fade_min_distance = 128.0
-distance_fade_max_distance = 96.0
-
-[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_kuir1"]
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_67h0u"]
+name = "grass"
 generated_type = 1
-height_offset = 0.5
-material_override = SubResource("StandardMaterial3D_tsvha")
+cast_shadows = 0
+material_override = ExtResource("1_mksqd")
+generated_faces = 3
 last_lod = 0
 last_shadow_lod = 0
 lod0_range = 128.0
@@ -38,5 +31,5 @@ normal_texture = ExtResource("4_6e4m6")
 uv_scale = 0.004
 
 [resource]
-mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_kuir1")])
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_67h0u")])
 texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_rvolm"), SubResource("Terrain3DTextureAsset_3hsgy")])

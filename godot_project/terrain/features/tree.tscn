@@ -1,0 +1,47 @@
+[gd_scene load_steps=6 format=3 uid="uid://csp1nd7yo5swr"]
+
+[ext_resource type="Texture2D" uid="uid://b8vrdwjjbs67p" path="res://assets/textures/tree low.png" id="1_oqu1r"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oqu1r"]
+transparency = 1
+cull_mode = 2
+albedo_texture = ExtResource("1_oqu1r")
+
+[sub_resource type="QuadMesh" id="QuadMesh_228tm"]
+material = SubResource("StandardMaterial3D_oqu1r")
+size = Vector2(30, 23)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_oqu1r"]
+top_radius = 0.001
+height = 15.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_228tm"]
+albedo_color = Color(0.028107282, 0.010909407, 0.000592109, 1)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="most_detailed" type="Node3D" parent="."]
+
+[node name="tree" type="MeshInstance3D" parent="most_detailed"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.84450364, 9.398772, 0)
+mesh = SubResource("QuadMesh_228tm")
+skeleton = NodePath("../..")
+
+[node name="tree2" type="MeshInstance3D" parent="most_detailed"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 9.399, -0.68666315)
+mesh = SubResource("QuadMesh_228tm")
+skeleton = NodePath("../..")
+
+[node name="trunk" type="MeshInstance3D" parent="most_detailed"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+mesh = SubResource("CylinderMesh_oqu1r")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_228tm")
+
+[node name="less_detailed" type="Node3D" parent="."]
+
+[node name="trunk" type="MeshInstance3D" parent="less_detailed"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 0)
+mesh = SubResource("CylinderMesh_oqu1r")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_228tm")
