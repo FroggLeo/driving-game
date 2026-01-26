@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cl13xei0bjtd7"
 path.s3tc="res://.godot/imported/rocky_grass_nrm_rgh.png-42d471512ec4b1c473d5d5a8d08a197e.s3tc.ctex"
+path.etc2="res://.godot/imported/rocky_grass_nrm_rgh.png-42d471512ec4b1c473d5d5a8d08a197e.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://terrain/assets/rocky_grass_nrm_rgh.png"
-dest_files=["res://.godot/imported/rocky_grass_nrm_rgh.png-42d471512ec4b1c473d5d5a8d08a197e.s3tc.ctex"]
+dest_files=["res://.godot/imported/rocky_grass_nrm_rgh.png-42d471512ec4b1c473d5d5a8d08a197e.s3tc.ctex", "res://.godot/imported/rocky_grass_nrm_rgh.png-42d471512ec4b1c473d5d5a8d08a197e.etc2.ctex"]
 
 [params]
 

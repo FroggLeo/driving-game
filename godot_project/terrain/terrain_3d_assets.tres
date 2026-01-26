@@ -13,6 +13,7 @@
 [sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_67h0u"]
 name = "grass"
 generated_type = 1
+height_offset = 0.5
 cast_shadows = 0
 material_override = ExtResource("1_mksqd")
 generated_faces = 3

@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dgmfsreebu2sd"
 path.s3tc="res://.godot/imported/Tycho_catalog_skymap_v2.0_(threshold_magnitude_3.0,_low-res).png-d084616fc7d5af9d2445a8b0624725b6.s3tc.ctex"
+path.etc2="res://.godot/imported/Tycho_catalog_skymap_v2.0_(threshold_magnitude_3.0,_low-res).png-d084616fc7d5af9d2445a8b0624725b6.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://environment/Tycho_catalog_skymap_v2.0_(threshold_magnitude_3.0,_low-res).png"
-dest_files=["res://.godot/imported/Tycho_catalog_skymap_v2.0_(threshold_magnitude_3.0,_low-res).png-d084616fc7d5af9d2445a8b0624725b6.s3tc.ctex"]
+dest_files=["res://.godot/imported/Tycho_catalog_skymap_v2.0_(threshold_magnitude_3.0,_low-res).png-d084616fc7d5af9d2445a8b0624725b6.s3tc.ctex", "res://.godot/imported/Tycho_catalog_skymap_v2.0_(threshold_magnitude_3.0,_low-res).png-d084616fc7d5af9d2445a8b0624725b6.etc2.ctex"]
 
 [params]
 
