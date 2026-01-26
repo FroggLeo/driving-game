@@ -268,6 +268,10 @@ func _physics_process(delta: float):
 			# instead of braking then reverse
 			for w in rear_wheels:
 				_apply_engine_forces(state, w.state, rear_wheels.size(), i_drive)
+	else:
+		if state.speed < 0.5:
+			for w in all_wheels:
+				_apply_brake_force(w.state, all_wheels.size(), 1.0)
 	
 	# rolling resistance and aerodynamic drag
 	if state.speed > 0.01:
@@ -381,6 +385,7 @@ func _apply_brake_force(ws: WheelState, num_wheels: int, brake_input: float) -> 
 		return 0.0
 	var brake_force = max_brake_force * brake_input
 	brake_force /= num_wheels
+	brake_force = clamp(brake_force, 0.0, tire_long_cof * ws.normal_force)
 	apply_force(ws.dir_forward * brake_force * -sign(ws.axis_forward), ws.r_com_to_contact)
 	return brake_force
 
@@ -428,7 +433,7 @@ func _update_steering(delta: float) -> void:
 	state.update_steering(steer_angle, steer_angle_vel)
 
 ## driving input maps are: throttle, reverse, steer_left, steer_right, brake
-## these should all go from 0 to 1
+## these should all go from 0 to 1, exc3ept for i_drive and i_steer, which is -1..1
 func update_input(throttle: float, reverse: float, brake: float, steer: float) -> bool:
 	i_throttle = clamp(throttle, 0.0, 1.0)
 	i_reverse = clamp(reverse, 0.0, 1.0)

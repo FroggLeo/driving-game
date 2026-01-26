@@ -168,6 +168,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_xhmyn")
 [node name="sc_fl" type="ShapeCast3D" parent="wheels/fl"]
 process_physics_priority = -1
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+enabled = false
 shape = SubResource("CylinderShape3D_hkabp")
 target_position = Vector3(0, 0, 0)
 max_results = 3
@@ -184,6 +185,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_xhmyn")
 [node name="sc_fr" type="ShapeCast3D" parent="wheels/fr"]
 process_physics_priority = -1
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+enabled = false
 shape = SubResource("CylinderShape3D_jpe8o")
 target_position = Vector3(0, 0, 0)
 max_results = 3
@@ -200,6 +202,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_xhmyn")
 [node name="sc_rl" type="ShapeCast3D" parent="wheels/rl"]
 process_physics_priority = -1
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+enabled = false
 shape = SubResource("CylinderShape3D_h3fet")
 target_position = Vector3(0, 0, 0)
 max_results = 3
@@ -216,6 +219,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_xhmyn")
 [node name="sc_rr" type="ShapeCast3D" parent="wheels/rr"]
 process_physics_priority = -1
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+enabled = false
 shape = SubResource("CylinderShape3D_bkrhx")
 target_position = Vector3(0, 0, 0)
 max_results = 3
