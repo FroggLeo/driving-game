@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=14 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://c8rg4afao8hqe" path="res://car/car.tscn" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
@@ -31,8 +31,11 @@ shader_parameter/wave_dir1 = Vector2(1, 0)
 shader_parameter/wave_dir2 = Vector2(0, 1)
 shader_parameter/wave_speed = 0.015
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_pkg7o"]
+size = Vector2(1100, 1100)
+
 [sub_resource type="PlaneMesh" id="PlaneMesh_ioo17"]
-size = Vector2(30000, 30000)
+size = Vector2(50000, 50000)
 subdivide_width = 1
 subdivide_depth = 1
 
@@ -69,7 +72,13 @@ assets = ExtResource("6_pkg7o")
 top_level = true
 metadata/_edit_lock_ = true
 
+[node name="volcano_lake" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, -1004.71606, 995.6771, 1411.4594)
+material_override = SubResource("ShaderMaterial_gbfbk")
+mesh = SubResource("PlaneMesh_pkg7o")
+skeleton = NodePath("../ocean")
+
 [node name="ocean" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3947296, 0.3385559, -0.7468109)
 material_override = SubResource("ShaderMaterial_gbfbk")
 mesh = SubResource("PlaneMesh_ioo17")
