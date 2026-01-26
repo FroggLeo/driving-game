@@ -265,6 +265,7 @@ func exit_vehicle(car: RigidBody3D) -> void:
 		return # if returned false, cannot exit
 	
 	global_position = v_exit_mkr.global_position
+	global_rotation = Vector3.ZERO
 	
 	v_driving = false
 	v_driven_car = null
