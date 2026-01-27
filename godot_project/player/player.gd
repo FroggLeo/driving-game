@@ -68,10 +68,12 @@ func _unhandled_input(event):
 				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 			else:
 				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+			get_parent().get_node("pause").visible = false
 			Global.paused = false
 		else:
 			# call to pause menu code here
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+			get_parent().get_node("pause").visible = true
 			Global.paused = true
 	
 	# skip if paused

@@ -234,6 +234,8 @@ func _ready():
 	# enter area interactable
 	enter_area.body_entered.connect(_body_entered)
 	enter_area.body_exited.connect(_body_exited)
+	$packagearea.body_entered.connect(_body_entered)
+	$packagearea.body_exited.connect(_body_exited)
 
 # movement code
 func _physics_process(delta: float):
@@ -284,10 +286,14 @@ func _physics_process(delta: float):
 func _body_entered(body: Node) -> void:
 	if body is CharacterBody3D and body.has_method("set_interactable"):
 		body.set_interactable(self, enter_orig, "car", "Enter")
+	elif body.has_method("set_interactable"):
+		body.set_interactable(self, enter_orig, "car", "Enter")
 
 # when a body exits the enter area
 func _body_exited(body: Node) -> void:
 	if body is CharacterBody3D and body.has_method("set_interactable"):
+		body.clear_interactable(self)
+	elif body.has_method("set_interactable"):
 		body.clear_interactable(self)
 
 func _apply_suspension(w: WheelData, ws: WheelState) -> float:

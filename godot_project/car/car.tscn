@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=4 uid="uid://c8rg4afao8hqe"]
+[gd_scene load_steps=35 format=4 uid="uid://c8rg4afao8hqe"]
 
 [ext_resource type="Script" uid="uid://c4o4i021y0hua" path="res://car/car.gd" id="1_2gitb"]
 [ext_resource type="ArrayMesh" uid="uid://bciu3mjj2uavw" path="res://assets/models/car_body.tres" id="2_h3fet"]
@@ -260,6 +260,9 @@ shadow_mesh = SubResource("ArrayMesh_bx008")
 height = 0.26
 radius = 0.45
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_bkrhx"]
+size = Vector3(1.465332, 1.164856, 1.7856445)
+
 [node name="car" type="RigidBody3D"]
 center_of_mass_mode = 1
 script = ExtResource("1_2gitb")
@@ -405,3 +408,9 @@ enabled = false
 shape = SubResource("CylinderShape3D_bkrhx")
 target_position = Vector3(0, 0, 0)
 max_results = 3
+
+[node name="packagearea" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="packagearea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0026855469, 0.92701864, 1.9353915)
+shape = SubResource("BoxShape3D_bkrhx")

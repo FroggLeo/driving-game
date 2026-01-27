@@ -1,8 +1,10 @@
-[gd_scene load_steps=23 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=31 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://c8rg4afao8hqe" path="res://car/car.tscn" id="1_aqk2v"]
+[ext_resource type="PackedScene" uid="uid://e4aa2hb4p8hv" path="res://mission.tscn" id="1_cbp6q"]
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
 [ext_resource type="PackedScene" uid="uid://cmvvu0pixwdta" path="res://environment/sky.tscn" id="3_tlwt5"]
+[ext_resource type="Script" uid="uid://bycp3kcu8efif" path="res://box.gd" id="4_26xuy"]
 [ext_resource type="Terrain3DMaterial" uid="uid://cpwmhhyhwr2n" path="res://terrain/terrain_3d_material.tres" id="5_dwbse"]
 [ext_resource type="Texture2D" uid="uid://b7fcui7yb5fo0" path="res://addons/kenney_prototype_textures/red/texture_08.png" id="6_dwbse"]
 [ext_resource type="Terrain3DAssets" uid="uid://qnbod831dic6" path="res://terrain/terrain_3d_assets.tres" id="6_pkg7o"]
@@ -16,10 +18,14 @@
 [ext_resource type="PackedScene" uid="uid://cshvprtplbfuv" path="res://assets/models/tunnel.tscn" id="13_2u3nc"]
 [ext_resource type="PackedScene" uid="uid://babffpqf4sonh" path="res://assets/models/tunnel_entrances.tscn" id="13_hiqwa"]
 [ext_resource type="PackedScene" uid="uid://ccf6esm0fa6wq" path="res://assets/models/bridge.tscn" id="15_udxuc"]
+[ext_resource type="PackedScene" uid="uid://brbs2n1t187l" path="res://assets/meshes/building.glb" id="17_udxuc"]
+[ext_resource type="Script" uid="uid://g5yk7ikdpi0l" path="res://citymission.gd" id="20_26xuy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dwbse"]
+size = Vector3(1, 0.5, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_pkg7o"]
+size = Vector3(1, 0.5, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gbfbk"]
 albedo_texture = ExtResource("6_dwbse")
@@ -48,6 +54,18 @@ size = Vector2(50000, 50000)
 subdivide_width = 1
 subdivide_depth = 1
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_bc84e"]
+size = Vector3(389.01965, 127.11572, 631.4171)
+
+[sub_resource type="LabelSettings" id="LabelSettings_26xuy"]
+font_size = 100
+
+[sub_resource type="LabelSettings" id="LabelSettings_bc84e"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_wukud"]
+font_size = 18
+
 [node name="World" type="Node3D"]
 
 [node name="car" parent="." instance=ExtResource("1_aqk2v")]
@@ -55,10 +73,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 214.30411, 365.9554, -1636.86
 
 [node name="player" parent="." instance=ExtResource("1_f3sb7")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 211.30411, 361.86343, -1636.8656)
+enable_first_person = false
+
+[node name="mission" parent="." instance=ExtResource("1_cbp6q")]
 
 [node name="box" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 214.30411, 372.46347, -1634.6656)
 mass = 100.0
+script = ExtResource("4_26xuy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="box"]
 shape = SubResource("BoxShape3D_dwbse")
@@ -68,7 +90,7 @@ mesh = SubResource("BoxMesh_pkg7o")
 surface_material_override/0 = SubResource("StandardMaterial3D_gbfbk")
 
 [node name="sky" parent="." instance=ExtResource("3_tlwt5")]
-day_length = 120.0
+day_length = 600.0
 sun_energy = 3.0
 time = 0.614
 year_time = 0.32
@@ -226,7 +248,7 @@ use_lowpoly_preview = true
 edge_containers = Array[NodePath]([NodePath(""), NodePath("")])
 edge_rp_targets = Array[NodePath]([NodePath(""), NodePath("")])
 edge_rp_target_dirs = Array[int]([-1, -1])
-edge_rp_locals = Array[NodePath]([NodePath("Node3D"), NodePath("RP_005")])
+edge_rp_locals = Array[NodePath]([NodePath("Node3D"), NodePath("RP_006")])
 edge_rp_local_dirs = Array[int]([0, 1])
 
 [node name="Node3D" type="Node3D" parent="RoadManager/beach2tunnel"]
@@ -723,9 +745,19 @@ transform = Transform3D(-0.31808144, -0.0037737968, 0.9480559, -0.0015991963, 0.
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
-prior_mag = 246.67998
+prior_mag = 17.850367
 next_mag = 246.67998
+prior_pt_init = NodePath("../RP_006")
 next_pt_init = NodePath("../RP_004")
+
+[node name="RP_006" type="Node3D" parent="RoadManager/beach2tunnel"]
+transform = Transform3D(-0.023206761, -0.017467966, 0.99957806, -0.00050812593, 0.9998474, 0.017460877, -0.99973047, -0.00010270119, -0.023212098, -2357.3389, 282.7399, -88.582886)
+script = ExtResource("10_k3n1d")
+traffic_dir = Array[int]([2, 1])
+lanes = Array[int]([5, 5])
+prior_mag = 17.850367
+next_mag = 17.850367
+next_pt_init = NodePath("../RP_005")
 
 [node name="RoadTerrain3DConnector" type="Node" parent="." node_paths=PackedStringArray("terrain", "road_manager")]
 script = ExtResource("11_ic0uy")
@@ -743,3 +775,81 @@ metadata/_custom_type_script = "uid://cx1g7l1njhp6h"
 [node name="tunnel_entrances" parent="tunnel_things" instance=ExtResource("13_hiqwa")]
 
 [node name="bridge" parent="tunnel_things" instance=ExtResource("15_udxuc")]
+
+[node name="buildings" type="Node3D" parent="."]
+
+[node name="building" parent="buildings" instance=ExtResource("17_udxuc")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2638.9102, 78.50162, -1191.7921)
+
+[node name="building2" parent="buildings" instance=ExtResource("17_udxuc")]
+transform = Transform3D(0.15714113, 0, 0.9875761, 0, 1.21, 0, -0.9875761, 0, 0.15714113, 2752.7432, 54.934746, -1397.8848)
+
+[node name="building3" parent="buildings" instance=ExtResource("17_udxuc")]
+transform = Transform3D(0.089941286, 0, -0.9976759, 0, 1.0649999, 0, 1.3169322, 0, 0.06813733, 2783.4055, 48.28566, -1540.8573)
+
+[node name="building4" parent="buildings" instance=ExtResource("17_udxuc")]
+transform = Transform3D(0.14723976, 0, 0.9891008, 0, 0.855, 0, -0.9891008, 0, 0.14723976, 2558.6272, 71.92943, -1498.8771)
+
+[node name="building5" parent="buildings" instance=ExtResource("17_udxuc")]
+transform = Transform3D(0.032643735, 0, 1.0996094, 0, 1, 0, -1.224565, 0, 0.029312741, 2544.3503, 86.47592, -1367.1819)
+
+[node name="city" type="Area3D" parent="."]
+script = ExtResource("20_26xuy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="city"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2677.828, 90.50101, -1371.5308)
+shape = SubResource("BoxShape3D_bc84e")
+
+[node name="pause" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="pause"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="pause/PanelContainer"]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="pause/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="pause/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "PAUSED"
+label_settings = SubResource("LabelSettings_26xuy")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="pause/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "press Esc to unpause"
+label_settings = SubResource("LabelSettings_bc84e")
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="pause/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "
+
+Controls:
+Pause - Esc
+Walk & Drive - W A S D
+Zoom in - Scroll Up
+Zoom out - Scroll Down
+Rotate Camera - hold right click & move mouse
+Sprint - Ctrl
+Enter & Exit Car - E
+Jump - Space"
+label_settings = SubResource("LabelSettings_wukud")
+horizontal_alignment = 1

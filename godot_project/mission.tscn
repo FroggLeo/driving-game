@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3 uid="uid://e4aa2hb4p8hv"]
+
+[ext_resource type="Script" uid="uid://b1plposb5gqds" path="res://basicmission.gd" id="1_egi7e"]
+
+[node name="mission" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_egi7e")
+
+[node name="fail" type="Button" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -213.0
+offset_top = -26.0
+offset_right = 215.0
+offset_bottom = 27.0
+theme_override_font_sizes/font_size = 32
+text = "  You failed your mission :(  "
+
+[node name="message" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -483.0
+offset_top = -53.0
+offset_right = 491.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 32
+text = "Your mission: Deliver the big red package down to beachtown 
+(click to accept)"
+
+[node name="win" type="Button" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -251.0
+offset_top = -53.0
+offset_right = 256.0
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "  YAYY! What a pro driver you are!  
+Mission Success :D
+  thanks for playing all the way through!  "
+
+[connection signal="button_up" from="fail" to="." method="_on_button_button_up"]
+[connection signal="button_up" from="message" to="." method="_on_message_button_up"]
+[connection signal="button_up" from="win" to="." method="_on_win_button_up"]
