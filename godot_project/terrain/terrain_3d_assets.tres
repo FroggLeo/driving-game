@@ -1,4 +1,4 @@
-[gd_resource type="Terrain3DAssets" load_steps=15 format=3 uid="uid://qnbod831dic6"]
+[gd_resource type="Terrain3DAssets" load_steps=21 format=3 uid="uid://qnbod831dic6"]
 
 [ext_resource type="Material" uid="uid://cbxy6yryob8nl" path="res://terrain/features/grass.tres" id="1_mksqd"]
 [ext_resource type="Texture2D" uid="uid://qao6p6jef7oa" path="res://terrain/assets/rock_alb_ht.dds" id="1_oifc5"]
@@ -9,6 +9,10 @@
 [ext_resource type="Texture2D" uid="uid://c4cqq8xf7y5tn" path="res://terrain/assets/snow_nrm_rgh.png" id="7_rvolm"]
 [ext_resource type="Texture2D" uid="uid://dw5rv2qgcjjt1" path="res://terrain/assets/sand_alb_ht.png" id="8_3hsgy"]
 [ext_resource type="Texture2D" uid="uid://bao36icmny5f6" path="res://terrain/assets/sand_nrm_rgh.png" id="9_01tww"]
+[ext_resource type="Texture2D" uid="uid://cvwpifjku7f0i" path="res://terrain/assets/asphalt_alb_ht.png" id="10_j7rsu"]
+[ext_resource type="Texture2D" uid="uid://c7qwf0n4svwkv" path="res://terrain/assets/asphalt_nrm_rgh.png" id="11_7eur2"]
+[ext_resource type="Texture2D" uid="uid://eq8l5kd76tno" path="res://terrain/assets/gravel_alb_ht.png" id="12_4a626"]
+[ext_resource type="Texture2D" uid="uid://dlxjy34sffdr" path="res://terrain/assets/gravel_nrm_rgh.png" id="13_r0ygc"]
 
 [sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_67h0u"]
 name = "grass"
@@ -36,19 +40,33 @@ normal_texture = ExtResource("4_6e4m6")
 uv_scale = 0.004
 
 [sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_01tww"]
-name = "snow_alb_ht"
+name = "snow"
 id = 2
 albedo_texture = ExtResource("6_6e4m6")
 normal_texture = ExtResource("7_rvolm")
 uv_scale = 0.004
 
 [sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_petck"]
-name = "sand_alb_ht"
+name = "sand"
 id = 3
 albedo_texture = ExtResource("8_3hsgy")
 normal_texture = ExtResource("9_01tww")
 uv_scale = 0.004
 
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_kp5du"]
+name = "asphalt"
+id = 4
+albedo_texture = ExtResource("10_j7rsu")
+normal_texture = ExtResource("11_7eur2")
+uv_scale = 0.004
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_qgh4x"]
+name = "gravel"
+id = 5
+albedo_texture = ExtResource("12_4a626")
+normal_texture = ExtResource("13_r0ygc")
+uv_scale = 0.004
+
 [resource]
 mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_67h0u")])
-texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_rvolm"), SubResource("Terrain3DTextureAsset_3hsgy"), SubResource("Terrain3DTextureAsset_01tww"), SubResource("Terrain3DTextureAsset_petck")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_rvolm"), SubResource("Terrain3DTextureAsset_3hsgy"), SubResource("Terrain3DTextureAsset_01tww"), SubResource("Terrain3DTextureAsset_petck"), SubResource("Terrain3DTextureAsset_kp5du"), SubResource("Terrain3DTextureAsset_qgh4x")])

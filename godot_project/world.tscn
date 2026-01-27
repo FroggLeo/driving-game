@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=23 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://c8rg4afao8hqe" path="res://car/car.tscn" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
@@ -8,6 +8,7 @@
 [ext_resource type="Terrain3DAssets" uid="uid://qnbod831dic6" path="res://terrain/terrain_3d_assets.tres" id="6_pkg7o"]
 [ext_resource type="Shader" uid="uid://xouchkbyqx1d" path="res://environment/water.gdshader" id="7_pkg7o"]
 [ext_resource type="Script" uid="uid://dw653v4djyeok" path="res://addons/road-generator/nodes/road_manager.gd" id="8_wse8f"]
+[ext_resource type="Material" uid="uid://r3x70hlc8w10" path="res://assets/materials/road.tres" id="9_2u3nc"]
 [ext_resource type="Script" uid="uid://brg1qactiyldp" path="res://addons/road-generator/nodes/road_container.gd" id="9_ic0uy"]
 [ext_resource type="Script" uid="uid://d3n0wtam3aii0" path="res://addons/road-generator/nodes/road_point.gd" id="10_k3n1d"]
 [ext_resource type="PackedScene" uid="uid://dfggtpn3gyrn0" path="res://addons/road-generator/custom_containers/3way_2x2.tscn" id="11_2o6r5"]
@@ -50,20 +51,13 @@ subdivide_depth = 1
 [node name="World" type="Node3D"]
 
 [node name="car" parent="." instance=ExtResource("1_aqk2v")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2590.379, 91.95491, -1277.1836)
-
-[node name="sky" parent="." instance=ExtResource("3_tlwt5")]
-day_length = 120.0
-sun_energy = 3.0
-time = 0.614
-year_time = 0.32
-moon_season = 0.491
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 214.30411, 365.9554, -1636.8656)
 
 [node name="player" parent="." instance=ExtResource("1_f3sb7")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2587.379, 87.86296, -1277.1836)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 211.30411, 361.86343, -1636.8656)
 
 [node name="box" type="RigidBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2590.379, 98.46297, -1274.9836)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 214.30411, 372.46347, -1634.6656)
 mass = 100.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="box"]
@@ -72,6 +66,13 @@ shape = SubResource("BoxShape3D_dwbse")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="box"]
 mesh = SubResource("BoxMesh_pkg7o")
 surface_material_override/0 = SubResource("StandardMaterial3D_gbfbk")
+
+[node name="sky" parent="." instance=ExtResource("3_tlwt5")]
+day_length = 120.0
+sun_energy = 3.0
+time = 0.614
+year_time = 0.32
+moon_season = 0.491
 
 [node name="Terrain3D" type="Terrain3D" parent="."]
 data_directory = "res://terrain/terraindata"
@@ -89,10 +90,12 @@ skeleton = NodePath("../ocean")
 [node name="ocean" type="MeshInstance3D" parent="."]
 material_override = SubResource("ShaderMaterial_gbfbk")
 mesh = SubResource("PlaneMesh_ioo17")
+metadata/_edit_lock_ = true
 
 [node name="RoadManager" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2579.274, 77.77834, -1548.5575)
 script = ExtResource("8_wse8f")
+material_resource = ExtResource("9_2u3nc")
 metadata/_custom_type_script = "uid://dw653v4djyeok"
 
 [node name="beach_main" type="Node3D" parent="RoadManager"]
