@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cshvprtplbfuv"]
+
+[ext_resource type="PackedScene" uid="uid://dvnk8iqkf23g4" path="res://assets/meshes/tunnel.glb" id="1_k0bax"]
+[ext_resource type="Material" uid="uid://duh4fxr58u2tu" path="res://assets/materials/worn_brick_wall.tres" id="2_lx8l6"]
+
+[node name="tunnel" instance=ExtResource("1_k0bax")]
+
+[node name="BézierCurve_001" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_lx8l6")

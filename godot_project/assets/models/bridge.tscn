@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://ccf6esm0fa6wq"]
+
+[ext_resource type="PackedScene" uid="uid://b0j3siv8eg0em" path="res://assets/meshes/bridge.glb" id="1_t245l"]
+[ext_resource type="Material" uid="uid://cukud5u3n5kwb" path="res://assets/materials/concrete_layers_02.tres" id="2_4wu42"]
+
+[node name="bridge" instance=ExtResource("1_t245l")]
+
+[node name="Plane" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_4wu42")

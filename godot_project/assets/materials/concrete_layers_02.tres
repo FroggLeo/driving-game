@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" load_steps=4 format=3 uid="uid://cukud5u3n5kwb"]
+
+[ext_resource type="Texture2D" uid="uid://dnjj4k8slm8au" path="res://assets/textures/concrete_layers_02_diff_1k.png" id="1_tdxfk"]
+[ext_resource type="Texture2D" uid="uid://cdwqacqsv0d1g" path="res://assets/textures/concrete_layers_02_nor_gl_1k.png" id="2_aeyx3"]
+[ext_resource type="Texture2D" uid="uid://dd2qx4ifrd1mj" path="res://assets/textures/concrete_layers_02_rough_1k.png" id="3_u52j2"]
+
+[resource]
+albedo_texture = ExtResource("1_tdxfk")
+roughness_texture = ExtResource("3_u52j2")
+roughness_texture_channel = 4
+normal_enabled = true
+normal_texture = ExtResource("2_aeyx3")
+texture_filter = 0

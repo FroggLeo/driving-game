@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=22 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://c8rg4afao8hqe" path="res://car/car.tscn" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
@@ -12,7 +12,9 @@
 [ext_resource type="Script" uid="uid://d3n0wtam3aii0" path="res://addons/road-generator/nodes/road_point.gd" id="10_k3n1d"]
 [ext_resource type="PackedScene" uid="uid://dfggtpn3gyrn0" path="res://addons/road-generator/custom_containers/3way_2x2.tscn" id="11_2o6r5"]
 [ext_resource type="Script" uid="uid://cx1g7l1njhp6h" path="res://addons/road-generator/connectors/terrain3d_road_connector.gd" id="11_ic0uy"]
-[ext_resource type="Material" uid="uid://dpashsuk5lr4x" path="res://addons/road-generator/resources/road_texture.material" id="12_70uel"]
+[ext_resource type="PackedScene" uid="uid://cshvprtplbfuv" path="res://assets/models/tunnel.tscn" id="13_2u3nc"]
+[ext_resource type="PackedScene" uid="uid://babffpqf4sonh" path="res://assets/models/tunnel_entrances.tscn" id="13_hiqwa"]
+[ext_resource type="PackedScene" uid="uid://ccf6esm0fa6wq" path="res://assets/models/bridge.tscn" id="15_udxuc"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dwbse"]
 
@@ -96,9 +98,9 @@ metadata/_custom_type_script = "uid://dw653v4djyeok"
 [node name="beach_main" type="Node3D" parent="RoadManager"]
 script = ExtResource("9_ic0uy")
 use_lowpoly_preview = true
-edge_containers = Array[NodePath]([NodePath(""), NodePath("../3way_2x2")])
-edge_rp_targets = Array[NodePath]([NodePath(""), NodePath("RP_003")])
-edge_rp_target_dirs = Array[int]([-1, 1])
+edge_containers = Array[NodePath]([NodePath(""), NodePath("")])
+edge_rp_targets = Array[NodePath]([NodePath(""), NodePath("")])
+edge_rp_target_dirs = Array[int]([-1, -1])
 edge_rp_locals = Array[NodePath]([NodePath("RP_001"), NodePath("RP_011")])
 edge_rp_local_dirs = Array[int]([0, 1])
 
@@ -209,26 +211,19 @@ prior_mag = 48.747692
 next_mag = 48.747692
 next_pt_init = NodePath("../RP_010")
 
-[node name="3way_2x2" type="Node3D" parent="RoadManager" instance=ExtResource("11_2o6r5")]
+[node name="3way_2x2" parent="RoadManager" instance=ExtResource("11_2o6r5")]
 transform = Transform3D(0.081784815, 0.010331317, -0.99659675, 0.057381213, 0.9982388, 0.015057279, 0.994997, -0.05841737, 0.081047945, -9.2854, 7.869629, 473.90637)
-script = ExtResource("9_ic0uy")
-create_geo = false
-material_resource = ExtResource("12_70uel")
-use_lowpoly_preview = true
-generate_ai_lanes = true
-edge_containers = Array[NodePath]([NodePath("../beach2tunnel"), NodePath(""), NodePath("../beach_main")])
-edge_rp_targets = Array[NodePath]([NodePath("Node3D"), NodePath(""), NodePath("RP_011")])
-edge_rp_target_dirs = Array[int]([0, -1, 1])
-edge_rp_locals = Array[NodePath]([NodePath("RP_001"), NodePath("RP_002"), NodePath("RP_003")])
-edge_rp_local_dirs = Array[int]([1, 0, 1])
+edge_containers = Array[NodePath]([NodePath("../beach2tunnel"), NodePath(""), NodePath("")])
+edge_rp_targets = Array[NodePath]([NodePath("Node3D"), NodePath(""), NodePath("")])
+edge_rp_target_dirs = Array[int]([0, -1, -1])
 
 [node name="beach2tunnel" type="Node3D" parent="RoadManager"]
 script = ExtResource("9_ic0uy")
 use_lowpoly_preview = true
-edge_containers = Array[NodePath]([NodePath("../3way_2x2"), NodePath("")])
-edge_rp_targets = Array[NodePath]([NodePath("RP_001"), NodePath("")])
-edge_rp_target_dirs = Array[int]([1, -1])
-edge_rp_locals = Array[NodePath]([NodePath("Node3D"), NodePath("Node3D045")])
+edge_containers = Array[NodePath]([NodePath(""), NodePath("")])
+edge_rp_targets = Array[NodePath]([NodePath(""), NodePath("")])
+edge_rp_target_dirs = Array[int]([-1, -1])
+edge_rp_locals = Array[NodePath]([NodePath("Node3D"), NodePath("RP_005")])
 edge_rp_local_dirs = Array[int]([0, 1])
 
 [node name="Node3D" type="Node3D" parent="RoadManager/beach2tunnel"]
@@ -687,7 +682,47 @@ traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
 prior_mag = 85.497444
 next_mag = 85.497444
+prior_pt_init = NodePath("../RP_002")
 next_pt_init = NodePath("../Node3D044")
+
+[node name="RP_002" type="Node3D" parent="RoadManager/beach2tunnel"]
+transform = Transform3D(-0.068778194, -0.0013049892, 0.99763113, 0, 0.99999917, 0.0013080868, -0.9976321, 8.996788e-05, -0.068778165, -869.21326, 342.34512, 252.83728)
+script = ExtResource("10_k3n1d")
+traffic_dir = Array[int]([2, 1])
+lanes = Array[int]([5, 5])
+prior_mag = 166.73305
+next_mag = 98.07101
+prior_pt_init = NodePath("../RP_003")
+next_pt_init = NodePath("../Node3D045")
+
+[node name="RP_003" type="Node3D" parent="RoadManager/beach2tunnel"]
+transform = Transform3D(0.32367814, -0.0022847108, 0.9461645, 0.0010153281, 0.9999973, 0.002067363, -0.94616663, 0.00029150728, 0.3236797, -1186.4141, 342.20898, 146.94043)
+script = ExtResource("10_k3n1d")
+traffic_dir = Array[int]([2, 1])
+lanes = Array[int]([5, 5])
+prior_mag = 348.04764
+next_mag = 166.73305
+prior_pt_init = NodePath("../RP_004")
+next_pt_init = NodePath("../RP_002")
+
+[node name="RP_004" type="Node3D" parent="RoadManager/beach2tunnel"]
+transform = Transform3D(0.066476345, -0.002904762, 0.99778396, -0.000369009, 0.9999957, 0.0029357874, -0.997788, -0.00056335155, 0.06647497, -1821.0231, 340.8665, -123.222534)
+script = ExtResource("10_k3n1d")
+traffic_dir = Array[int]([2, 1])
+lanes = Array[int]([5, 5])
+prior_mag = 246.67998
+next_mag = 348.04764
+prior_pt_init = NodePath("../RP_005")
+next_pt_init = NodePath("../RP_003")
+
+[node name="RP_005" type="Node3D" parent="RoadManager/beach2tunnel"]
+transform = Transform3D(-0.31808144, -0.0037737968, 0.9480559, -0.0015991963, 0.9999928, 0.0034439901, -0.948062, -0.00042065812, -0.3180852, -2322.1628, 278.6962, -94.68445)
+script = ExtResource("10_k3n1d")
+traffic_dir = Array[int]([2, 1])
+lanes = Array[int]([5, 5])
+prior_mag = 246.67998
+next_mag = 246.67998
+next_pt_init = NodePath("../RP_004")
 
 [node name="RoadTerrain3DConnector" type="Node" parent="." node_paths=PackedStringArray("terrain", "road_manager")]
 script = ExtResource("11_ic0uy")
@@ -697,3 +732,11 @@ offset = -0.1
 edge_margin = 0.8
 edge_falloff = 10.0
 metadata/_custom_type_script = "uid://cx1g7l1njhp6h"
+
+[node name="tunnel_things" type="Node3D" parent="."]
+
+[node name="tunnel" parent="tunnel_things" instance=ExtResource("13_2u3nc")]
+
+[node name="tunnel_entrances" parent="tunnel_things" instance=ExtResource("13_hiqwa")]
+
+[node name="bridge" parent="tunnel_things" instance=ExtResource("15_udxuc")]

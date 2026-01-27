@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://babffpqf4sonh"]
+
+[ext_resource type="PackedScene" uid="uid://dxlecgtj07gy3" path="res://assets/meshes/tunnel_entrances.glb" id="1_m3wrv"]
+[ext_resource type="Material" uid="uid://dm1gf47tt8ak3" path="res://assets/materials/concrete_layers.tres" id="2_02olt"]
+
+[node name="tunnel_entrances" instance=ExtResource("1_m3wrv")]
+
+[node name="Circle" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_02olt")
+
+[node name="Circle_001" parent="." index="1"]
+surface_material_override/0 = ExtResource("2_02olt")
+
+[node name="Circle_002" parent="." index="2"]
+surface_material_override/0 = ExtResource("2_02olt")
+
+[node name="Circle_003" parent="." index="3"]
+surface_material_override/0 = ExtResource("2_02olt")
