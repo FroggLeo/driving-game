@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://b72rwva4plq2l"]
+
+[ext_resource type="PackedScene" uid="uid://brwcsr3hsrckv" path="res://assets/meshes/car bad.glb" id="1_a0ynq"]
+[ext_resource type="Material" uid="uid://d4ka5t2nrr0kn" path="res://assets/materials/blue_paint.tres" id="2_kswbx"]
+[ext_resource type="Material" uid="uid://b3w13pqvpuc35" path="res://assets/materials/wheel.tres" id="3_4nlji"]
+
+[node name="car bad" instance=ExtResource("1_a0ynq")]
+
+[node name="Cube" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_kswbx")
+
+[node name="Cylinder_001" parent="." index="1"]
+surface_material_override/0 = ExtResource("3_4nlji")
+
+[node name="Cylinder_002" parent="." index="2"]
+surface_material_override/0 = ExtResource("3_4nlji")
+
+[node name="Cylinder_003" parent="." index="3"]
+surface_material_override/0 = ExtResource("3_4nlji")
+
+[node name="Cylinder_006" parent="." index="4"]
+surface_material_override/0 = ExtResource("3_4nlji")

@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://b3w13pqvpuc35"]
+
+[ext_resource type="Texture2D" uid="uid://sjy5es24626l" path="res://assets/meshes/car bad_wheel.png" id="1_o76iw"]
+
+[resource]
+albedo_texture = ExtResource("1_o76iw")

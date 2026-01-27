@@ -5,18 +5,23 @@
 [ext_resource type="Script" uid="uid://b5if6cd5wxbpt" path="res://player/third_person_spring.gd" id="2_rkbax"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bu0v1"]
+radius = 0.4
+height = 1.6
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yw30f"]
 albedo_texture = ExtResource("2_g1dw6")
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_sh265"]
 material = SubResource("StandardMaterial3D_yw30f")
+radius = 0.4
+height = 1.6
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qjkh3"]
 albedo_texture = ExtResource("2_g1dw6")
 
 [sub_resource type="BoxMesh" id="BoxMesh_rkbax"]
 material = SubResource("StandardMaterial3D_qjkh3")
+size = Vector3(0.8, 0.3, 0.4)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_oul6g"]
 
@@ -35,7 +40,7 @@ mesh = SubResource("CapsuleMesh_sh265")
 skeleton = NodePath("../..")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="mesh"]
-transform = Transform3D(1, 0, 0, 0, 0.5, 0, 0, 0, 0.6, 0, 1.5, -0.29999998)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.19999999)
 mesh = SubResource("BoxMesh_rkbax")
 skeleton = NodePath("../..")
 
