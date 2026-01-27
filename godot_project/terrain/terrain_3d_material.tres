@@ -47,4 +47,3 @@ _shader_parameters = {
 world_background = 0
 texture_filtering = 1
 auto_shader = true
-show_autoshader = true
