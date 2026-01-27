@@ -92,7 +92,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_gbfbk")
 [node name="sky" parent="." instance=ExtResource("3_tlwt5")]
 day_length = 600.0
 sun_energy = 3.0
-time = 0.614
+time = 0.526
 year_time = 0.32
 moon_season = 0.491
 
