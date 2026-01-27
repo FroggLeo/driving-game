@@ -72,7 +72,7 @@ font_size = 18
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 214.30411, 365.9554, -1636.8656)
 
 [node name="player" parent="." instance=ExtResource("1_f3sb7")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 211.30411, 361.86343, -1636.8656)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1377.0343, 361.8634, -1926.2008)
 enable_first_person = false
 
 [node name="mission" parent="." instance=ExtResource("1_cbp6q")]
