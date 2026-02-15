@@ -482,7 +482,7 @@ prior_pt_init = NodePath("../Node3D023")
 next_pt_init = NodePath("../Node3D021")
 
 [node name="Node3D023" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(-0.8348943, 0.09777515, -0.54165596, 0.14381976, 0.9886598, -0.043215618, 0.5312878, -0.113981314, -0.8394888, -568.6201, 81.81321, -883.4823)
+transform = Transform3D(-0.83903974, -0.055879068, -0.54119265, -0.038351256, 0.9983118, -0.04361939, 0.5427162, -0.015842985, -0.83976674, -568.6201, 81.81321, -883.4823)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
