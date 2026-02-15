@@ -9,6 +9,7 @@ const vec3 PLANET_CENTER = vec3(0.0, -PLANET_RADIUS, 0.0); // assumes y=0 is pla
 const float ATMOSPHERE_HEIGHT = 100000.0; // how high the atmosphere is, this one uses the karman line
 
 group_uniforms world;
+	uniform bool auto_camera_altitude = true;
 	uniform float camera_altitude: hint_range(1.0, 99999.0, 0.01) = 1.0;
 	uniform float exposure: hint_range(0.0, 80.0, 0.5) = 11.0;
 	uniform vec3 base_sky_color: source_color = vec3(0.0, 0.0039, 0.0275);
@@ -894,7 +895,7 @@ vec3 apply_artistic_effects(vec3 top, vec3 view_dir, vec3 sun_dir, vec3 color) {
 	return color;
 }
 
-vec3 apply_horizon_fog(vec3 top, vec3 view_dir, vec3 color) {
+vec3 apply_horizon_fog(vec3 top, vec3 view_dir, vec3 color, float altitude) {
 	if (fog_amount * fog_density < 1e-6) {
 		return color;
 	}
@@ -903,20 +904,25 @@ vec3 apply_horizon_fog(vec3 top, vec3 view_dir, vec3 color) {
 	float factor = 1.0 - exp(-fog_band * fog_density);
 	factor *= fog_amount;
 	factor = clamp(factor, 0.0, 1.0);
-	vec3 camera_origin = PLANET_CENTER + vec3(0.0, PLANET_RADIUS + camera_altitude, 0.0);
+	vec3 camera_origin = PLANET_CENTER + vec3(0.0, PLANET_RADIUS + altitude, 0.0);
 	return mix(color, fog_color, factor);
 }
 
 // Called for every visible pixel in the sky background, as well as all pixels
 // in the radiance cubemap.
 void sky() {
+	// auto altitude
+	float cam_alt = camera_altitude;
+	if (auto_camera_altitude) {
+		cam_alt = POSITION.y;
+	}
 	// environment stuff
 	vec3 c = base_sky_color; // final color that will be applied
 	vec3 top = vec3(0.0,1.0,0.0); // the top of the world/zenith
 	vec3 view_dir = normalize(EYEDIR); // the direction where this pixel is
 	float height = view_dir.y; // how high this pixel is, -1..1
 	float up = clamp(view_dir.y * 0.5 + 0.5, 0.0, 1.0); // shifting height -1..1 to 0..1\
-	vec3 camera_origin = PLANET_CENTER + vec3(0.0, PLANET_RADIUS + camera_altitude, 0.0);
+	vec3 camera_origin = PLANET_CENTER + vec3(0.0, PLANET_RADIUS + cam_alt, 0.0);
 	// sun and moon
 	vec3 sun_dir = top; // default to top
 	if (LIGHT0_ENABLED) { sun_dir = normalize(LIGHT0_DIRECTION); }
@@ -944,7 +950,7 @@ void sky() {
 	}
 	// the fog is coming
 	if (enable_fog) {
-		c = apply_horizon_fog(top, view_dir, c);
+		c = apply_horizon_fog(top, view_dir, c, cam_alt);
 	}
 	if (enable_artistic_effects) {
 		c = apply_artistic_effects(top, view_dir, sun_dir, c);

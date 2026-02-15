@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://7grxhc34xo4f"]
+[gd_scene load_steps=30 format=3 uid="uid://7grxhc34xo4f"]
 
 [ext_resource type="PackedScene" uid="uid://c8rg4afao8hqe" path="res://car/car.tscn" id="1_aqk2v"]
 [ext_resource type="PackedScene" uid="uid://bjkm6ximd4nus" path="res://player/player.tscn" id="1_f3sb7"]
@@ -28,6 +28,11 @@ size = Vector3(1, 0.5, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gbfbk"]
 albedo_texture = ExtResource("6_dwbse")
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ikiii"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_cbp6q"]
+noise = SubResource("FastNoiseLite_ikiii")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gbfbk"]
 render_priority = 0
 shader = ExtResource("7_pkg7o")
@@ -35,14 +40,17 @@ shader_parameter/depth_fade_distance = 1.0
 shader_parameter/absorbance = 2.0
 shader_parameter/shallow_color = Color(0.22, 0.66, 1, 1)
 shader_parameter/deep_color = Color(0, 0.25, 0.45, 1)
-shader_parameter/foam_amount = 0.2
+shader_parameter/foam_amount = 0.50000002375
 shader_parameter/foam_color = Color(1, 1, 1, 1)
+shader_parameter/foam_noise = SubResource("NoiseTexture2D_cbp6q")
 shader_parameter/roughness = 0.05
 shader_parameter/wave_scale = 4.0
 shader_parameter/height_scale = 0.15
 shader_parameter/wave_dir1 = Vector2(1, 0)
 shader_parameter/wave_dir2 = Vector2(0, 1)
 shader_parameter/wave_speed = 0.015
+shader_parameter/sky_fade_start = 2000.0
+shader_parameter/sky_fade_end = 10000.0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_pkg7o"]
 size = Vector2(1100, 1100)
@@ -724,7 +732,7 @@ prior_pt_init = NodePath("../RP_004")
 next_pt_init = NodePath("../RP_002")
 
 [node name="RP_004" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(0.066476345, -0.002904762, 0.99778396, -0.000369009, 0.9999957, 0.0029357874, -0.997788, -0.00056335155, 0.06647497, -1821.0231, 340.8665, -123.222534)
+transform = Transform3D(0.06496119, -0.002905614, 0.99788374, -0.00036900907, 0.9999958, 0.002935788, -0.9978879, -0.0005589403, 0.06495983, -1821.0231, 340.8665, -123.222534)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
@@ -744,7 +752,7 @@ prior_pt_init = NodePath("../RP_006")
 next_pt_init = NodePath("../RP_004")
 
 [node name="RP_006" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(-0.023206761, -0.017467966, 0.99957806, -0.00050812593, 0.9998474, 0.017460877, -0.99973047, -0.00010270119, -0.023212098, -2357.3389, 282.7399, -88.582886)
+transform = Transform3D(-0.023206761, -0.017467966, 0.99957806, -0.00050812593, 0.9998474, 0.017460877, -0.99973047, -0.00010270119, -0.023212098, -2358.4824, 282.7399, -88.582886)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])

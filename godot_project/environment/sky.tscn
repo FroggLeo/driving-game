@@ -105,7 +105,7 @@ time = 0.505
 transform = Transform3D(1, 0, 0, 0, 0.91705996, -0.39874902, 0, 0.39874902, 0.91705996, 0, 0, 0)
 
 [node name="sun" type="Node3D" parent="sun_tilt"]
-transform = Transform3D(-0.9995064, 0.031410918, -1.8722366e-09, -0.026040832, -0.82862836, -0.5591929, -0.017564764, -0.55891687, 0.8290376, 0, 0, 0)
+transform = Transform3D(-0.99950635, 0.031410918, -2.797844e-09, -0.026040832, -0.82862836, -0.5591929, -0.017564764, -0.5589168, 0.8290376, 0, 0, 0)
 
 [node name="sun_light" type="DirectionalLight3D" parent="sun_tilt/sun"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -5, 0)
@@ -120,7 +120,7 @@ mesh = SubResource("SphereMesh_gr5xt")
 transform = Transform3D(1, 0, 0, 0, 0.9170601, -0.39874908, 0, 0.39874908, 0.9170601, 0, 0, 0)
 
 [node name="moon" type="Node3D" parent="moon_tilt"]
-transform = Transform3D(-0.9995064, 0.031410918, -1.8722366e-09, -0.026040832, -0.82862836, -0.5591929, -0.017564764, -0.55891687, 0.8290376, 0, 0, 0)
+transform = Transform3D(-0.99950635, 0.031410918, -2.797844e-09, -0.026040832, -0.82862836, -0.5591929, -0.017564764, -0.5589168, 0.8290376, 0, 0, 0)
 
 [node name="moon_light" type="DirectionalLight3D" parent="moon_tilt/moon"]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 5, 0)

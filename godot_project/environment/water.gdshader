@@ -26,6 +26,9 @@ uniform sampler2D normal2;
 uniform vec2 wave_dir2 = vec2(0.0, 1.0);
 uniform float wave_speed : hint_range(0.0, 0.2) = 0.015;
 
+uniform float sky_fade_start: hint_range(10.0, 10000.0, 1.0) = 2000.0;
+uniform float sky_fade_end: hint_range(10.0, 50000.0, 1.0) = 10000.0;
+
 vec3 screen(vec3 base, vec3 blend){
 	return 1.0 - (1.0 - base) * (1.0 - blend);
 }
@@ -41,7 +44,7 @@ void fragment()
 {
 	// Depth texture magic
 	float depth = texture(DEPTH_TEXTURE, SCREEN_UV, 0.0).r;
-  	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, depth);
+	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, depth);
 	vec4 world = INV_VIEW_MATRIX * INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
 	float depth_texture_y = world.y / world.w;
 	float vertex_y = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).y;
@@ -68,8 +71,13 @@ void fragment()
 	vec2 normal_offset2 = (TIME * wave_dir2) * wave_speed;
 	vec3 normal_blend = mix(texture(normal1, uv_world_pos.xz / wave_scale + normal_offset1), texture(normal2, uv_world_pos.xz / wave_scale + normal_offset2), 0.5).rgb;
 	
+	// fade out to sky as distance increases
+	vec3 camera_pos = CAMERA_POSITION_WORLD;
+	float distance_to_cam = distance(uv_world_pos, camera_pos);
+	float fade_factor = smoothstep(sky_fade_end, sky_fade_start, distance_to_cam);
+	
 	ALBEDO = color_out;
-	ALPHA = alpha_blend;
+	ALPHA = alpha_blend * fade_factor;
 	ROUGHNESS = roughness;
 	NORMAL_MAP = normal_blend;
 }
