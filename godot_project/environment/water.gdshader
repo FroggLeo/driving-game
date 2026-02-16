@@ -29,6 +29,9 @@ uniform float wave_speed : hint_range(0.0, 0.2) = 0.015;
 uniform float sky_fade_start: hint_range(10.0, 10000.0, 1.0) = 2000.0;
 uniform float sky_fade_end: hint_range(10.0, 50000.0, 1.0) = 10000.0;
 
+uniform float island_fade_start: hint_range(10.0, 10000.0, 1.0) = 2000.0;
+uniform float island_fade_end: hint_range(10.0, 50000.0, 1.0) = 10000.0;
+
 vec3 screen(vec3 base, vec3 blend){
 	return 1.0 - (1.0 - base) * (1.0 - blend);
 }
@@ -74,10 +77,10 @@ void fragment()
 	// fade out to sky as distance increases
 	vec3 camera_pos = CAMERA_POSITION_WORLD;
 	float distance_to_cam = distance(uv_world_pos, camera_pos);
-	float fade_factor = smoothstep(sky_fade_end, sky_fade_start, distance_to_cam);
-	
+	float cam_fade_factor = smoothstep(sky_fade_end, sky_fade_start, distance_to_cam);
+	float island_fade_factor = smoothstep(island_fade_end, island_fade_start, length(uv_world_pos));
 	ALBEDO = color_out;
-	ALPHA = alpha_blend * fade_factor;
+	ALPHA = alpha_blend * max(cam_fade_factor, island_fade_factor);
 	ROUGHNESS = roughness;
 	NORMAL_MAP = normal_blend;
 }
