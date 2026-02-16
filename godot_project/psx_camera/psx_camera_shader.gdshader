@@ -4,6 +4,7 @@ uniform sampler2D depth_texture : source_color, hint_depth_texture;
 uniform sampler2D screen_texture : source_color, hint_screen_texture, repeat_disable, filter_nearest;
 
 uniform bool enable_fog = true;
+uniform bool enable_sky_fog = true;
 uniform vec3 fog_color : source_color;
 uniform vec3 noise_color : source_color;
 uniform float fog_distance : hint_range(1, 6000) = 100;
@@ -64,6 +65,9 @@ void fragment(){
 	if (enable_noise){
 		vec3 twocolornoise = color_mix(fog_color, noise_color, hashOld12(screen_coords));
 		final_color = color_mix(twocolornoise, final_color, depth_mask_inv);
+	}
+	if (!enable_sky_fog && depth <= 0.0) {
+		depth_mask_inv = 0.0;
 	}
 	if (enable_fog){
 		final_color = color_mix(fog_color, final_color, depth_mask_inv);

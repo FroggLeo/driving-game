@@ -76,7 +76,7 @@ font_size = 18
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 214.30411, 365.9554, -1636.8656)
 
 [node name="player" parent="." instance=ExtResource("1_f3sb7")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 208.59225, 361.8634, -1632.6803)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 208.59225, 362.1374, -1632.6803)
 enable_first_person = false
 
 [node name="box" type="RigidBody3D" parent="."]
@@ -246,11 +246,11 @@ edge_rp_target_dirs = Array[int]([0, -1, -1])
 [node name="beach2tunnel" type="Node3D" parent="RoadManager"]
 script = ExtResource("9_ic0uy")
 use_lowpoly_preview = true
-edge_containers = Array[NodePath]([NodePath(""), NodePath(""), NodePath(""), NodePath("")])
-edge_rp_targets = Array[NodePath]([NodePath(""), NodePath(""), NodePath(""), NodePath("")])
-edge_rp_target_dirs = Array[int]([-1, -1, -1, -1])
-edge_rp_locals = Array[NodePath]([NodePath("Node3D"), NodePath("RP_006"), NodePath("RP_001"), NodePath("RP_001")])
-edge_rp_local_dirs = Array[int]([0, 1, 0, 1])
+edge_containers = Array[NodePath]([NodePath(""), NodePath("")])
+edge_rp_targets = Array[NodePath]([NodePath(""), NodePath("")])
+edge_rp_target_dirs = Array[int]([-1, -1])
+edge_rp_locals = Array[NodePath]([NodePath("Node3D"), NodePath("RP_006")])
+edge_rp_local_dirs = Array[int]([0, 1])
 
 [node name="Node3D" type="Node3D" parent="RoadManager/beach2tunnel"]
 transform = Transform3D(0.081784815, 0.010331317, -0.99659675, 0.057381213, 0.9982388, 0.015057279, 0.994997, -0.05841737, 0.081047945, 6.6601563, 7.6287155, 472.60962)
