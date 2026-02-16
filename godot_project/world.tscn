@@ -572,7 +572,7 @@ prior_pt_init = NodePath("../Node3D032")
 next_pt_init = NodePath("../Node3D030")
 
 [node name="Node3D032" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(-0.061184593, -0.10156196, 0.9929459, -0.1273185, 0.9874776, 0.09315734, -0.98997253, -0.12072068, -0.0733492, -1132.5924, 202.9812, -531.18567)
+transform = Transform3D(-0.083919205, -0.08251037, 0.99305063, 0.12134826, 0.9883028, 0.09237059, -0.98905575, 0.12825671, -0.07292511, -1132.5924, 202.9812, -531.18567)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
@@ -582,7 +582,7 @@ prior_pt_init = NodePath("../Node3D033")
 next_pt_init = NodePath("../Node3D031")
 
 [node name="Node3D033" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(-0.9589995, -0.115596235, -0.25875986, -0.12542859, 0.99186414, 0.021758836, 0.25413918, 0.05332263, -0.96569663, -1186.1763, 196.5191, -408.82996)
+transform = Transform3D(-0.9576295, 0.12644018, -0.25876236, 0.12530568, 0.9918972, 0.02094242, 0.2593135, -0.012369327, -0.9657139, -1186.1763, 196.5191, -408.82996)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
@@ -592,7 +592,7 @@ prior_pt_init = NodePath("../Node3D034")
 next_pt_init = NodePath("../Node3D032")
 
 [node name="Node3D034" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(-0.8588448, -0.17020541, -0.48313028, -0.13306466, 0.9849347, -0.11044463, 0.4946499, -0.030567253, -0.8685547, -1154.6725, 200.19147, -337.71936)
+transform = Transform3D(-0.87304366, 0.064186946, -0.48339844, 0.13317698, 0.9849989, -0.10973431, 0.469103, -0.16018051, -0.86849546, -1154.6725, 200.19147, -337.71936)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
@@ -602,27 +602,27 @@ prior_pt_init = NodePath("../Node3D035")
 next_pt_init = NodePath("../Node3D033")
 
 [node name="Node3D035" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(-0.3656162, -0.27805233, -0.8882633, -0.1113786, 0.96054894, -0.25483534, 0.92407715, 0.0057616076, -0.38216144, -1107.318, 215.7204, -286.6598)
+transform = Transform3D(-0.41448796, -0.19924647, -0.8879755, 0.08426416, 0.9631446, -0.25544578, 0.9061448, -0.18070385, -0.3824226, -1107.318, 215.7204, -286.6598)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
-prior_mag = 63.539616
-next_mag = 35.177757
+prior_mag = 25.71643
+next_mag = 19.382507
 prior_pt_init = NodePath("../Node3D036")
 next_pt_init = NodePath("../Node3D034")
 
 [node name="Node3D036" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(0.61402303, -0.017323745, -0.7890977, -0.05156257, 0.9967436, -0.062005006, 0.78760135, 0.07876047, 0.6111305, -1010.6642, 223.51984, -289.68152)
+transform = Transform3D(0.49344087, -0.08042242, -0.8660533, 0.052232657, 0.9966594, -0.06279053, 0.8682089, -0.014252861, 0.4959933, -1010.6642, 223.51984, -289.68152)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
-prior_mag = 68.94413
+prior_mag = 25.654785
 next_mag = 63.539616
 prior_pt_init = NodePath("../Node3D037")
 next_pt_init = NodePath("../Node3D035")
 
 [node name="Node3D037" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(0.46670702, -0.27090055, -0.84190094, 0.14184001, 0.9625382, -0.23108909, 0.87296325, -0.011564359, 0.48764813, -925.7185, 234.65417, -340.21362)
+transform = Transform3D(0.52220666, -0.13788378, -0.8415984, -0.11855149, 0.9655252, -0.2317479, 0.84453803, 0.22079325, 0.48785755, -925.7185, 234.65417, -340.21362)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
@@ -632,7 +632,7 @@ prior_pt_init = NodePath("../Node3D038")
 next_pt_init = NodePath("../Node3D036")
 
 [node name="Node3D038" type="Node3D" parent="RoadManager/beach2tunnel"]
-transform = Transform3D(-0.32469317, 0, -0.9458195, 0, 1.0000004, 0, 0.94581884, 0, -0.32469338, -830.0325, 241.5495, -346.6129)
+transform = Transform3D(-0.32469317, 0, -0.9458195, 0, 1.0000004, 0, 0.94581884, 0, -0.32469338, -830.0325, 241.79517, -346.6129)
 script = ExtResource("10_k3n1d")
 traffic_dir = Array[int]([2, 1])
 lanes = Array[int]([5, 5])
